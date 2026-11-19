@@ -1,0 +1,9 @@
+# dsh-kanban-painel - camada de patch do bundle.
+#
+# Insere a linha que monta a metade HOST deste pacote. A metade host nao
+# registra nada (veja lib/index.js): todo o trabalho esta na metade CLIENTE
+# (lib/client.js), declarada em package.json -> dsh.client.platform = "web",
+# que adiciona a aba "Kanban" na barra lateral direita.
+- insert:
+    - id: kanban-painel
+      name: 'dsh-kanban-painel'

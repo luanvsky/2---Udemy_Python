@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\Aula_2_-_Paradigma_Data-Intensive_e_Limites_Fsicos.pdf",
+  "sourceSha256": "0cba31d599a6b1eab067fb08e18f4a91491719703f8dad876e00f702208b01d0",
+  "dpi": 144,
+  "pageCount": 36,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\aula2_render\\page-0001.png",
+      "width": 1920,
+      "height": 1080,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 118927
+    }
+  ],
+  "missingFonts": []
+}

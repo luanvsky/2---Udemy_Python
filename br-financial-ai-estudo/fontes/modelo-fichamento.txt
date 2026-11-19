@@ -1,0 +1,122 @@
+ UNIVERSIDADE FEDERAL DE SERGIPE
+PROCC
+DISCIPLINA: T�picos avan�ados em Engenharia de Software e Sistemas de informa��o
+SEMESTRE: 2026/2
+Prof. Dr. Fabio Gomes Rocha
+
+
+ FICHAMENTO
+
+
+ Refer�ncia bibliogr�fica completa: (com base no artigo selecionado)
+
+ASMARE, Musa Biruk; NAFI, Kawser Wazed; KHOMH, Foutse; ANTONIOL, Giuliano. Antipadr�es de desempenho de acesso a dados em sistemas de uso intensivo de dados. arXiv preprint, arXiv:2208.08918v1, 2022.
+
+Objetivos: (iniciar com verbos... de 3 a 5 objetivos - verificar a introdu��o do autor...)
+
+* Identificar os antipadr�es de desempenho de acesso a dados prevalentes em sistemas de uso intensivo de dados.
+* Categorizar e construir uma taxonomia das causas raiz dos problemas de acesso a dados em ambientes NoSQL e de persist�ncia poliglota.
+* Validar empiricamente a relev�ncia percebida desses antipadr�es junto a desenvolvedores de software da ind�stria.
+* Investigar o impacto e a distribui��o dos antipadr�es entre diferentes tecnologias de banco de dados e paradigmas de arquitetura.
+
+
+Metodologia: (como foi desenvolvido o estudo? Que tipo de pesquisa? Como est� estruturado?) 
+
+Estudo emp�rico com abordagem qualitativa e quantitativa. A pesquisa foi realizada em duas etapas principais: primeiro, os autores coletaram e analisaram relat�rios de problemas (issue reports) e commits em reposit�rios de c�digo aberto de 75 sistemas baseados em NoSQL e 87 sistemas de persist�ncia poliglota, aplicando codifica��o intuitiva para identificar os antipadr�es. Em segundo lugar, realizaram uma pesquisa (survey) com desenvolvedores industriais para avaliar a relev�ncia pr�tica dos problemas catalogados. O texto est� estruturado com introdu��o, motiva��o, trabalhos relacionados, metodologia de coleta, taxonomia desenvolvida, valida��o dos resultados e amea�as � validade.
+
+Fontes: (quais foram as principais fontes utilizadas pelo autor? )
+
+* Reposit�rios de c�digo aberto de sistemas intensivos em dados hospedados no GitHub (sistemas NoSQL e com persist�ncia poliglota).
+* Relat�rios de bugs, discuss�es de pull requests e hist�ricos de commits dos projetos analisados.
+* Respostas e opini�es coletadas via question�rio com desenvolvedores de software profissionais da ind�stria.
+* Literatura acad�mica sobre d�vidas t�cnicas, code smells e antipadr�es de acesso a dados tradicionais (SQL) e web.
+
+
+Principais conceitos utilizados pelo autor (identificar e transcrever os principais conceitos  localizando as p�ginas):
+
+* "Aproveitar a vasta quantidade de dados heterog�neos gerados por humanos e m�quinas para obter insights acion�veis est� se tornando o foco de aten��o tanto na ind�stria quanto na comunidade de pesquisa." (p. 1)
+* "Assim como o software tradicional, esses sistemas s�o propensos a d�vidas t�cnicas, introduzidas para lidar com a press�o de restri��es de tempo e recursos sobre os desenvolvedores." (p. 1)
+* "Especificar antipadr�es de desempenho no acesso a dados � importante, pois � o primeiro passo antes da constru��o de ferramentas de detec��o autom�tica que s�o utilizadas para estudar a preval�ncia e o impacto desses antipadr�es." (p. 1)
+
+
+Principais conclus�es do autor (identificar e transcrever as principais conclus�es localizando as p�ginas):
+
+* "Devido �s diferen�as nos mecanismos de acesso a dados entre bancos de dados relacionais e NoSQL, os antipadr�es de desempenho identificados em [estudos anteriores] podem n�o ser generaliz�veis para sistemas de uso intensivo de dados baseados em NoSQL." (p. 1)
+* "Embora a vantagem de escolher o banco de dados com base na natureza dos dados seja clara, as quest�es associadas de projeto, implementa��o e manuten��o n�o foram bem investigadas." (p. 1)
+* "A cataloga��o dos antipadr�es de acesso a dados em arquiteturas NoSQL e poliglotas fornece a base essencial para o desenvolvimento de ferramentas de an�lise est�tica e din�mica focadas no desempenho de Big Data." (p. 1)
+
+Coment�rio pessoal:
+
+O artigo aborda uma lacuna cr�tica no desenvolvimento moderno de software, visto que a transi��o de bancos relacionais para solu��es NoSQL e poliglotas frequentemente replica h�bitos inadequados de codifica��o. A estrutura��o de uma taxonomia clara para antipadr�es de acesso a dados permite que equipes de engenharia de software identifiquem gargalos de desempenho precocemente. A valida��o pr�tica com profissionais da ind�stria eleva o valor aplicado do estudo, tornando-o um guia indispens�vel para a cria��o de ferramentas de linter e refatora��o autom�tica.
+
+Palavras-chave: (5 palavras-chave significativas relativas ao texto)
+
+Antipadr�es de desempenho; Sistemas intensivos em dados; NoSQL; Persist�ncia poliglota; D�vida t�cnica.
+
+(m�ximo de 2 p�ginas)
+
+
+Aqui est� uma explica��o simples e pr�tica, ponto por ponto, do que significa cada parte do fichamento para voc� dominar o conte�do do artigo:
+
+1. Objetivos (O que os autores queriam fazer)
+
+
+* Identificar e categorizar os antipadr�es: O artigo quer descobrir quais s�o os erros mais comuns que os programadores cometem ao escrever c�digos que buscam ou salvam dados. "Antipadr�o" � o oposto de uma "boa pr�tica": � uma forma errada (ou ineficiente) de resolver um problema.
+
+* Construir uma taxonomia: Taxonomia � apenas uma palavra bonita para "cat�logo organizado" ou "classifica��o". Eles organizaram esses erros por tipos e causas.
+
+* Validar com desenvolvedores: Os autores n�o queriam apenas teorizar. Eles perguntaram a programadores do mercado real: "Voc�s veem esses erros acontecendo no dia a dia?" para confirmar se o estudo tinha aplica��o pr�tica.
+
+* Avaliar o impacto em NoSQL e Persist�ncia Poliglota: Antigamente, os sistemas usavam apenas um banco de dados tradicional (SQL/Relacional). Hoje, usa-se NoSQL (bancos n�o relacionais para grandes volumes de dados) e Persist�ncia Poliglota (usar v�rios tipos de bancos de dados diferentes no mesmo sistema). O objetivo foi ver como os erros mudam nesses ambientes modernos.
+
+2. Metodologia (Como a pesquisa foi realizada)
+
+
+* Estudo Emp�rico (Qualitativo e Quantitativo): Significa que eles analisaram dados reais da pr�tica (emp�rico), combinando n�meros/estat�sticas (quantitativo) com an�lise profunda do texto dos erros (qualitativo).
+
+* Coleta em 75 sistemas NoSQL e 87 Poliglotas: Eles foram no GitHub (plataforma onde programadores guardam c�digo) e examinaram relat�rios de falhas (issues) e hist�ricos de altera��es (commits) de 162 sistemas reais.
+
+* Codifica��o intuitiva: Os pesquisadores leram esses relat�rios e foram "etiquetando" os problemas para descobrir quais padr�es de erros se repetiam.
+
+* Survey (Question�rios): Enviaram perguntas para profissionais da ind�stria para validar os achados.
+
+3. Fontes (De onde sa�ram as informa��es)
+
+
+* Reposit�rios do GitHub: O "laborat�rio" dos pesquisadores foi o c�digo-fonte e o hist�rico de discuss�es de projetos de software livre de grande escala.
+
+* Desenvolvedores: A opini�o e experi�ncia pr�tica de profissionais da �rea.
+
+* Literatura Acad�mica: Livros e outros artigos cient�ficos sobre code smells (c�digo com "mau cheiro" ou m� qualidade) e d�vida t�cnica.
+
+4. Principais Conceitos (Termos-chave)
+
+
+* Insights acion�veis a partir de Big Data: A ideia de que as empresas recebem milh�es de dados por segundo e precisam processar isso rapidamente para tomar decis�es.
+
+* D�vida T�cnica (Technical Debt): � quando um programador faz um c�digo "gambiarra" ou apressado para entregar logo uma funcionalidade. No futuro, essa "d�vida" cobra juros, deixando o sistema lento ou quebrado.
+
+* Detec��o Autom�tica: O objetivo final da pesquisa � criar ferramentas (como um "corretor ortogr�fico", mas para c�digo) que avisem o programador: "Aten��o, essa forma de puxar dados do banco vai travar o sistema!".
+
+5. Principais Conclus�es (O que o estudo provou)
+
+
+* SQL  NoSQL: As regras do jogo mudaram. Um erro de banco de dados tradicional (SQL) n�o � igual a um erro em NoSQL. N�o d� para aplicar as velhas solu��es nos sistemas novos.
+
+* Falta de estudo sobre o custo de usar m�ltiplos bancos: Usar v�rios bancos de dados juntos (persist�ncia poliglota) traz vantagens, mas quase ningu�m ensina como programar isso sem gerar gargalos de desempenho e dores de cabe�a de manuten��o.
+
+* A base para futuras ferramentas: A maior contribui��o do artigo foi mapear o problema para que no futuro existam softwares autom�ticos capazes de prevenir esses travamentos antes do sistema ir ao ar.
+
+6. Palavras-chave Explicadas
+
+
+* Antipadr�es de desempenho: M� pr�tica de programa��o que deixa o sistema lento.
+
+* Sistemas intensivos em dados: Programas que processam gigantescas quantidades de informa��o ao mesmo tempo (ex: Netflix, Uber, grandes bancos).
+
+* NoSQL: Bancos de dados modernos projetados para flexibilidade e grande volume de dados.
+
+* Persist�ncia Poliglota: T�cnica de usar mais de um tipo de banco de dados no mesmo sistema (ex: usar um banco para o cadastro do usu�rio e outro diferente para a busca de produtos).
+
+* D�vida T�cnica: Atalhos e erros deixados no c�digo que custar�o tempo e dinheiro para serem corrigidos depois.
+

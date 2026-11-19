@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\05-m3tricity.pdf",
+  "sourceSha256": "0f38a993e1e99bac9e9ba558f1b8a9cc18990d588d489cddb6bc2ed2f98278bd",
+  "dpi": 200,
+  "pageCount": 4,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\m3tricity_render3\\page-0001.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 903457
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "D:\\dsh-vsky\\m3tricity_render3\\page-0002.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 729770
+    },
+    {
+      "index": 3,
+      "page": 3,
+      "path": "D:\\dsh-vsky\\m3tricity_render3\\page-0003.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 921410
+    },
+    {
+      "index": 4,
+      "page": 4,
+      "path": "D:\\dsh-vsky\\m3tricity_render3\\page-0004.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 1067225
+    }
+  ],
+  "missingFonts": []
+}

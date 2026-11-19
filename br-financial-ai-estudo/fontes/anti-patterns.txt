@@ -1,0 +1,626 @@
+Machine Translated by Google
+
+
+
+
+                                          Antipadrões de desempenho de acesso a dados em
+                                                                       sistemas de uso intensivo de dados
+
+                                  Musa Biruk Asmare                             Kawser Wazed Nafi                        Khomh errado                      Giuliano Antoniol
+                                                            ´                                             ´                                   ´                                    ´
+                                  Politécnica de Montreal biruk-           Politécnica de Montreal                  Politécnica de Montreal             Politécnica de Montreal
+                            asmare.muse@polymtl.ca                          kawser.nafi@usask.ca                   foutse.khomh@polymtl.ca                  antoniol@ieee.org
+
+
+
+
+                         Resumo—Contexto: Sistemas de uso intensivo de dados lidam com dados                   sistemas, sistemas intensivos em dados podem ser propensos a dívidas técnicas
+                       variáveis, de alto volume e alta velocidade, gerados por humanos e dispositivos         específicas de acesso a dados, como cheiros de acesso a dados (por exemplo,
+                       digitais. Assim como o software tradicional, esses sistemas são propensos a
+                                                                                                              cheiro de código SQL) [7] e antipadrões de desempenho de acesso a dados [8].
+                       dívidas técnicas, introduzidas para lidar com a pressão de restrições de tempo e
+                                                                                                                 Embora diversos estudos tenham investigado a prevalência e o impacto
+                       recursos sobre os desenvolvedores. O acesso a dados é um componente crítico
+                       desses sistemas, pois determina seu desempenho e funcionalidade geral. Embora           de dívidas técnicas em sistemas de software tradicionais [9]–[14], poucos
+                       as dívidas técnicas relacionadas ao acesso a dados estejam recebendo atenção           estudos consideraram sistemas com uso intensivo de dados e dívidas
+                       da comunidade de pesquisa, as dívidas técnicas que afetam o desempenho ainda           técnicas relacionadas ao código de acesso a dados [7], [15]–[17]. Em
+                       não foram suficientemente investigadas.
+                                                                                                              particular, as dívidas técnicas que afetam o desempenho do acesso a
+                                                                                                              dados não são bem investigadas, apesar de sua importância em sistemas
+                          Objetivo: Identificar, categorizar e validar problemas de desempenho de
+                       acesso a dados no contexto de sistemas de persistência de dados intensivos              com uso intensivo de dados. Recentemente, Shao et al. [8] revisaram
+                       baseados em NoSQL e poliglota, utilizando estudo qualitativo.                          trabalhos recentes para compilar uma lista de antipadrões de desempenho
+                          Método: Coletamos problemas de sistemas de código aberto com uso intensivo          de acesso a dados e a complementaram com novos antipadrões obtidos
+                       de dados, baseados em NoSQL e persistência poliglota, e identificamos problemas
+                                                                                                              a partir da análise de bugs de desempenho de acesso a dados em
+                       de desempenho de acesso a dados usando codificação indutiva, construindo uma
+                                                                                                               aplicações web baseadas em bancos de dados. No entanto, os antipadrões
+                       taxonomia das causas raiz. Em seguida, validamos a relevância percebida dos
+                       problemas de desempenho recém-identificados por meio de uma pesquisa com                de desempenho existentes foram obtidos considerando apenas bancos de
+                       desenvolvedores.                                                                        dados relacionais ou SQL e um pequeno número de aplicações web
+                          Palavras-chave: antipadrões de desempenho, sistemas com uso intensivo de            tradicionais. Recentemente, bancos de dados NoSQL estão se tornando
+                       dados, sistemas de persistência poliglota, banco de dados NoSQL, código de acesso a dados
+                                                                                                              componentes mais populares de sistemas com uso intensivo de dados
+                                                   I. INTRODUÇÃO                                              devido à sua escalabilidade horizontal e ao tratamento de dados
+                                                                                                              heterogêneos (por exemplo, suporte a dados não estruturados e esquema
+                          Aproveitar a vasta quantidade de dados heterogêneos gerados por
+                                                                                                               flexível) [18]. Devido às diferenças nos mecanismos de acesso a dados
+                       humanos e máquinas para obter insights acionáveis está se tornando o
+  arXiv:2208.08918v1
+
+
+
+
+                                                                                                               entre bancos de dados relacionais e NoSQL [19], os antipadrões de
+                       foco de atenção tanto na indústria¹ quanto na comunidade de pesquisa [1].
+                                                                                                               desempenho identificados em [8] podem não ser generalizáveis para
+                       Nossas decisões e estilo de vida são fortemente impactados pelos insights
+                                                                                                              sistemas de uso intensivo de dados baseados em NoSQL. Além disso,
+                       e recomendações obtidos a partir da análise desses big data [2]. Devido
+                                                                                                              para aproveitar as vantagens de ambos os paradigmas, sistemas baseados
+                       ao tamanho, heterogeneidade e complexidade, lidar com esses dados
+                                                                                                              em persistência poliglota estão se tornando mais populares. Embora a
+                       usando softwares e aplicativos tradicionais está se tornando cada vez
+                                                                                                               vantagem de escolher o banco de dados com base na natureza dos dados
+  [cs.SE]
+
+
+
+
+                       mais desafiador.
+  agosto
+
+
+
+
+                                                                                                               seja clara, as questões associadas de projeto, implementação e
+  2022
+
+
+
+
+                       Como resultado, sistemas de software com uso intensivo de dados, que
+                                                                                                               manutenção não foram bem investigadas [20]. Portanto, deve-se dar
+  de
+  18
+
+
+
+
+                       aproveitam a disponibilidade de infraestruturas em nuvem, foram introduzidos
+                                                                                                              atenção especial a sistemas de uso intensivo de dados baseados em NoSQL e em persis
+                       para enfrentar esse desafio. O desenvolvimento de sistemas com uso
+                                                                                                                 O objetivo deste estudo empírico é especificar antipadrões de
+                       intensivo de dados envolve a integração de armazenamento de dados (por
+                                                                                                              desempenho no acesso a dados, conduzindo uma análise qualitativa de
+                       exemplo, bancos de dados relacionais, NoSQL e poliglotas), processamento
+                                                                                                               problemas coletados dos repositórios de 75 sistemas de código aberto
+                       (por exemplo, enriquecimento, classificação e predição) e estruturas de
+                                                                                                              baseados em NoSQL e 87 sistemas de persistência poliglota com uso
+                       apresentação (serviços, APIs e aplicativos). A lógica de armazenamento e
+                                                                                                               intensivo de dados, e avaliando a relevância percebida desses antipadrões
+                       acesso a dados são componentes críticos de sistemas com uso intensivo de
+                                                                                                              por desenvolvedores de sistemas industriais com uso intensivo de dados.
+                       dados, determinando sua funcionalidade, usabilidade e desempenho. O
+                                                                                                               Em particular, buscamos responder às seguintes questões de pesquisa.
+                       desenvolvimento de sistemas com uso intensivo de dados apresenta diversos
+                       desafios de projeto, implementação e garantia de qualidade [2]–[5]. Os
+                                                                                                              RQ1 Quais são os antipadrões de desempenho de acesso a dados
+                       desenvolvedores desses sistemas, assim como os de sistemas de software
+                                                                                                                    prevalentes em sistemas com uso intensivo de dados?
+                       tradicionais, podem introduzir dívidas técnicas [6] que comprometem a
+                                                                                                                    Motivação: A especificação de antipadrões de desempenho de
+                       qualidade do software devido à pressão de lançamento e ao foco nos requisitos
+                                                                                                                     acesso a dados é importante, pois é o primeiro passo antes da
+                       funcionais. Além das dívidas técnicas comuns em softwares tradicionais,
+                                                                                                                    construção de ferramentas de detecção automática que são utilizadas
+                         1https://techjury.net/blog/big-data-statistics/#gref                                        para estudar a prevalência e o impacto desses antipadrões.
+Machine Translated by Google
+
+
+
+             A qualidade de sistemas com uso intensivo de dados e o desenvolvimento             sistemas [17]. A maioria dos estudos se concentra em sistemas relacionais ou
+             de ferramentas de refatoração para ajudar os desenvolvedores a detectar e          baseados em SQL. Como resultado, sistemas de persistência baseados em NoSQL
+             corrigir problemas de design antes que eles afetem a qualidade de seus             e poliglota não receberam muita atenção. Neste estudo, nos concentramos em
+             aplicativos.                                                                       sistemas de dados intensivos baseados em NoSQL e persistência poliglota para
+      RQ2 Como os desenvolvedores percebem a relevância dos antipadrões de                      complementar o estado da arte.
+             desempenho de acesso a dados?
+             Motivação: Responder a esta questão de pesquisa proporciona a perspectiva
+                                                                                                B. Antipadrões de desempenho de acesso a dados
+             dos desenvolvedores sobre a relevância dos antipadrões de desempenho
+             recém-identificados. Além disso, a taxonomia poderá ser expandida com                 Existem poucos estudos empíricos sobre bugs de desempenho [8], [26]–[29],
+             novos antipadrões potenciais que serão sugeridos pelos desenvolvedores             suas causas raiz [8], [26], [30], estratégias de correção [8], [26], [27], seu impacto
+             com base em sua experiência.                                                       ou relevância [8], [29] e abordagens de detecção baseadas em análises estáticas
+                                                                                                e dinâmicas [31]–[34]. Pesquisadores também sugeriram várias maneiras de
+                                                                                                otimizar o acesso a dados para melhorar o desempenho de aplicações web
+          O restante do artigo está organizado da seguinte forma. A Seção II discute os
+       trabalhos relacionados. A Seção III discute em detalhes a metodologia que                baseadas em bancos de dados, utilizando técnicas de cache e pré-busca [35]–[38].
+                                                                                                A maioria dos estudos de desempenho se concentra apenas em sistemas que
+       planejamos seguir para responder às nossas questões de pesquisa. Finalmente,
+                                                                                                utilizam bancos de dados relacionais orientados a ORM ou considera um
+       apresentamos nosso plano de execução na Seção IV.
+                                                                                                subconjunto dos antipadrões de desempenho; portanto, suas conclusões podem
+                                                                                                não ser generalizadas para o caso de sistemas de dados intensivos baseados em
+                                   II. TRABALHOS RELACIONADOS
+                                                                                                NoSQL e persistência poliglota.
+
+          Nesta seção, discutimos trabalhos recentes relacionados a dados.
+       Acesso a dívidas técnicas e antipadrões de desempenho.                                      O trabalho mais próximo deste estudo é o de Shao et al. [8], onde eles
+                                                                                                forneceram um catálogo de antipadrões de desempenho de acesso a dados obtidos
+      A. Dívidas técnicas de acesso a dados
+                                                                                                a partir de (1) revisão da literatura (24 antipadrões) e (2) 10 novos antipadrões,
+          A especificação [21], detecção [22]–[24], prevalência [7], [15], [16] impacto [7] e   analisando bugs de desempenho do mundo real coletados de sete aplicações web
+       práticas de refatoração [17] de dívidas técnicas de acesso a dados foram                 de código aberto baseadas em bancos de dados relacionais (BugZilla, DNN,
+       investigadas recentemente. Kar-win et al. [21] especificaram um catálogo de              Joomla!, MediaWiki, Moodle, WordPress e Odoo). Nossa abordagem baseada em
+       cheiros de código SQL.                                                                   palavras-chave para identificar bugs de desempenho de acesso a dados é
+       Este trabalho inspirou pesquisadores a investigar os "cheiros" de código e a propor      semelhante ao método usado neste trabalho. No entanto, estendemos as palavras-
+       abordagens de detecção automática. As ferramentas propostas realizam uma                 chave para abranger o caso de bancos de dados NoSQL. Embora a maioria dos
+       análise estática em consultas SQL [23], [24] e em consultas SQL incorporadas em          antipadrões esteja associada a consultas SQL, alguns antipadrões de desempenho,
+       código de acesso a dados [25] para detectar "cheiros" de código SQL. A                   como mover computação para o servidor ou não usar cache, também podem ser
+       disponibilidade das ferramentas promoveu a investigação empírica da prevalência          observados em sistemas baseados em NoSQL. Portanto, nosso objetivo é estender
+       e do impacto de dívidas técnicas de acesso a dados em geral e de "cheiros" de            os antipadrões de desempenho de acesso a dados para o caso de sistemas NoSQL
+       código SQL, em particular, utilizando sistemas de código aberto. De Almeida Filho        e sistemas de persistência poliglota com uso intensivo de dados. Além de fornecer
+       [15] investigou a prevalência e a coocorrência de "cheiros" de código SQL em             o catálogo, avaliaremos a relevância percebida das questões de desempenho de
+       projetos PL/SQL. Em outro trabalho, Muse et al. [7] conduziram um estudo empírico        acesso aos dados por meio de uma pesquisa com desenvolvedores.
+       em larga escala sobre "cheiros" de código SQL utilizando sistemas de código
+       aberto com uso intensivo de dados e descobriram que os "cheiros" de código SQL
+       são prevalentes e persistentes nesses sistemas. Em outro trabalho, Muse et al. [16]
+       investigaram dívidas técnicas autodeclaradas (SATDS) em sistemas com uso                                             III. MÉTODO DE ESTUDO
+       intensivo de dados baseados em SQL e NoSQL e descobriram que a SATD de
+       acesso a dados é introduzida à medida que o software amadurece e persiste por               O objetivo deste estudo é identificar, categorizar e investigar a relevância
+       um longo tempo sem ser resolvida. Eles também descobriram que as dívidas                 percebida dos problemas de desempenho de acesso a dados no contexto de
+       técnicas de acesso a dados (SATDs) são frequentemente introduzidas durante               sistemas de uso intensivo de dados baseados em NoSQL e em persistência
+       atividades de correção de bugs e refatoração, e propuseram uma taxonomia dessas          poliglota. Em particular, utilizamos problemas coletados desses sistemas como
+       dívidas. Os autores identificaram alguns exemplos de dívidas técnicas                    fonte de dados para nossa análise.
+       autodeclaradas associadas ao desempenho de execução de consultas, que podem              Nesta seção, descrevemos os detalhes do desenho do estudo, incluindo a
+       ser consideradas um antipadrão de desempenho de acesso a dados admitido pelos            identificação dos sistemas sujeitos, a coleta de dados, a análise de dados e a
+       desenvolvedores. Neste estudo, entretanto, investigamos problemas de desempenho resposta às perguntas de pesquisa. A Figura 1 apresenta uma visão geral da nossa
+       de acesso a dados utilizando dados relatados por usuários finais de sistemas             metodologia de estudo.
+       NoSQL e sistemas de persistência poliglota com uso intensivo de dados.
+
+                                                                                                A. Coleta de dados
+
+
+                                                                                                   Nos parágrafos seguintes, descrevemos os passos que seguimos para
+       Recentemente, as práticas de refatoração de código de acesso a dados dos                 selecionar os 75 sistemas NoSQL e os 87 sistemas poliglota baseados em
+       desenvolvedores também foram investigadas usando SQL para acesso intensivo a dados.
+                                                                                       persistência e com uso intensivo de dados.
+Machine Translated by Google
+
+
+
+                              Lista de palavras-
+                                                                                                              Coleta de dados
+                              chave NoSQL
+
+
+                                                                                                                                          [2] Filtrar                             [3] Selecionar repositórios
+                                                      [1] repositórios                          3264 sistemas                             repositórios que                      com o maior número
+                                                     de pesquisa                                                                                                                           de problemas
+                                                                                              baseados em NoSQL                           não estejam em inglês
+
+
+
+
+                                                                                                2172 sistemas
+                                                                                                  baseados em
+                                                                                               persistência poliglota
+
+
+
+
+                                                                                                                                                   [4] Filtrar
+                                                                                  75 sistemas de assunto baseados em                                     manualmente
+                                  [5] Coletar
+                                     edições                                     NoSQL e 87 sistemas de assunto baseados                                repositórios
+                                                                                        em persistência poliglota                                   irrelevantes
+
+
+
+
+                                                                                                       Extração de dados
+                                                                                                                                                                                             RQ1
+
+                                                                                                                                               Codificação aberta
+                                                                [1] Acesso a dados                                                                                                       Taxonomia de antipadrões
+                                                                                                       Problemas de                                       de
+                               Elasticsearch                         de filtro
+                                                                                                                                                problemas de                            de desempenho de acesso a
+                                       DB                        problemas de                         desempenho no
+                                                                                                                                                                                             dados
+                                                                                                            acesso a dados                      desempenho de
+                                                                         desempenho
+                                                                                                                                                        acesso a dados
+
+
+
+
+                                                                                                                                                                          RQ2
+
+
+                                                                                                                                              Realizar uma pesquisa com os
+                                                                                                                                                desenvolvedores para verificar a
+                                                                                                                                                  relevância dos antipadrões de
+                                                                                                                                                            desempenho identificados.
+
+
+
+
+                                                                                          Figura 1. Visão geral do método de estudo.
+
+
+
+          1) Pesquisa em repositórios: De forma semelhante à abordagem que
+       seguimos em nosso trabalho anterior [16], primeiro coletamos uma lista
+       de bancos de dados NoSQL populares, como MongoDB, Riak e
+       Redis. A lista de bancos de dados foi obtida do Eclipse JNoSQL.
+       framework2 que fornece um conjunto de APIs para aplicações Java
+       para interagir com bancos de dados NoSQL. A lista completa dos
+       bancos de dados estão disponíveis em nosso pacote de replicação [39]. Nós
+       Realizou uma busca em repositórios usando a API REST V3 do GitHub.
+       procuramos repositórios que mencionassem pelo menos um dos seguintes:
+       Os bancos de dados em nossa lista estão indicados em seus títulos, descrições ou arquivos README.
+
+       Para evitar tutoriais e projetos banais, definimos os critérios de busca.
+       considerar repositórios ativos (cujo último envio não é mais antigo
+       do que um ano a partir da data de coleta de dados), repositórios que
+                                                                                                                                Figura 2. Consulta do Elasticsearch para identificar problemas de desempenho no acesso a dados.
+       não são espelhados em outros repositórios, repositórios cujo código
+       O tamanho deve ser de pelo menos 100 KB e os repositórios devem ter pelo menos duas estrelas.
+       [20].
+                                                                                                                             modelos de persistência glot. Como parte do pacote de replicação, eles
+          Realizamos a busca no repositório em 1º de março de 2022 e...
+                                                                                                                             disponibilizaram o banco de dados de projetos e o uso correspondente de
+       Foram encontrados 20.340 repositórios candidatos antes da aplicação do critério de qualidade.
+                                                                                                                             modelos relacionais e de chave-valor, de colunas largas,
+       filtros e 3264 permaneceram após a aplicação do filtro de qualidade.
+                                                                                                                             Modelos NoSQL orientados a documentos e baseados em grafos. Em particular,
+          Para identificar sistemas de persistência poliglota com uso intensivo de dados,
+                                                                                                                             utilizamos duas tabelas do banco de dados fornecido.
+       começamos com o trabalho de Benats et al. [20] onde
+                                                                                                                             A primeira é uma visualização (VISUALIZAÇÃO DE REPOSITÓRIOS FILTRADOS)
+       Eles investigaram o uso de modelos de múltiplos bancos de dados utilizando
+                                                                                                                             que fornece a lista de repositórios após a filtragem de qualidade.
+       projetos coletados do Libraries.IO3 . Eles avaliaram
+                                                                                                                             (projetos com tamanho de código de pelo menos 100 KB e pelo menos
+       a popularidade de diferentes modelos de banco de dados, incluindo poli-
+                                                                                                                             duas estrelas). Esta lista contém 42176 projetos. A segunda
+          2http://www.jnosql.org/docs/supported dbs.html                                                                     tabela (REPOSITÓRIO SQL NOSQL COM TIPO DBMS)
+          3https://libraries.io/                                                                                             fornece o uso dos modelos de banco de dados mencionados anteriormente em
+Machine Translated by Google
+
+
+
+       todos os projetos. Combinando os dois, obtivemos o banco de dados.                                                                                                  TABELA I
+                                                                                                                            DISTRIBUIÇÃO DE MÉTRICAS DE NÍVEL DE REPOSITÓRIO PARA NOSQL E
+       uso do modelo em todos os sistemas 42K. Visto que nosso objetivo é
+                                                                                                                                                SISTEMAS DE ASSUNTOS POLIGLOTAS
+       Identificamos sistemas que utilizam bancos de dados de persistência poliglota, nós
+       Repositórios selecionados que possuem pelo menos dois modelos de banco de                                 Métrica                  Grupo Mínimo 25% Mediana Média                              75%     Máximo        padrão
+
+
+
+                                                                                                                                          Poliglota      5         71,5      508      4616,91         2896      61167    10747,29
+       dados, resultando em 6877 aplicações poliglota baseadas em persistência.                                  Estrelas
+                                                                                                                                          NoSQL          7         405      2229      6083,81        9043,5     58918    9880,86
+
+       Coletamos os metadados de cada repositório e os removemos.                                                Garfos                   Poliglota      0         29        127      1157,80          621      36393     4072,99
+                                                                                                                                          NoSQL          1         174       428      1318,23          954      21435     2863,24
+       repositórios cuja última atualização tenha mais de um ano a partir do                                                                            744                          130741,72 138677,5        1719944   297229,78
+                                                                                                                                          Poliglota               7912 22.727 8515
+                                                                                                                 Tamanho do código (Kb)
+                                                                                                                                          NoSQL         1126      23.010             132062,04 85.238,50       3836513   458862,46
+       data de coleta de dados semelhante aos critérios do sujeito NoSQL
+                                                                                                                                          Poliglota      30        476       1028     2963,41        2163,5    33914     5541,40
+                                                                                                                 Questões encerradas
+       sistemas. Finalmente, chegamos a 2172 assuntos poliglotas.                                                                         NoSQL         303        1001      1936     6761,79         4366     128001    18274,97
+
+                                                                                                                                          Poliglota     2,32       4,56      6,09       6.4             8,3     12,99        2.4
+       sistemas.                                                                                                 Idade (anos)                            1,4       4,71      6,97       7.1            9,52     13,76       3.03
+                                                                                                                                          NoSQL
+
+           2) Filtrar repositórios que não estejam em inglês: Observamos que o
+       Os arquivos de descrição e readme não estão escritos em inglês para
+       alguns repositórios. Filtramos os repositórios cujas descrições não estavam escritas
+                                                                                                                 problemas e elaborar o conjunto de dados sobre problemas de desempenho.
+       em inglês usando o Python Langdetect4.
+                                                                                                                        1) Problemas de desempenho no acesso aos dados do filtro: Semelhante ao
+       biblioteca. Após a filtragem por idioma, 2498 NoSQL e 1604
+                                                                                                                 Com base no trabalho de Shao et al. [8], utilizamos as seguintes heurísticas para
+       Repositórios poliglota baseados em persistência permaneceram.
+                                                                                                                 identificar problemas relacionados ao desempenho do acesso a dados. Construímos
+           3) Selecione os repositórios com o maior número de problemas:
+                                                                                                                 uma string de consulta do Elasticsearch usando palavras-chave associadas a
+       Como analisar todos os problemas dos 4102 repositórios não é
+                                                                                                                 desempenho (desempenho, lento, tempo limite, pesado), palavras-chave
+       viável e visto que não existe uma forma automática de medir o
+                                                                                                                 associados ao acesso a dados (leitura, gravação, busca, atualização, exclusão,
+       Relevância dos sistemas, precisamos restringir o número de
+                                                                                                                 carregar) e palavras-chave relacionadas a bancos de dados (dados, banco de dados, consulta,
+       sistemas de assunto, classificando os sistemas em ordem decrescente de
+                                                                                                                 esquema, índice, cache, tabela, partição, documento) conectados
+       o número de problemas e a escolha dos principais projetos. Nós selecionamos
+                                                                                                                 pelo operador AND. A consulta é formada em várias rodadas.
+       Os 150 principais bancos de dados NoSQL e os 150 principais bancos de dados com persistência poliglota.
+                                                                                                                 examinando os resultados retornados e modificando a consulta.
+       sistemas como sistemas de assunto candidatos.
+                                                                                                                 Para minimizar falsos positivos, aplicamos a consulta ao
+           4) Filtrar manualmente repositórios irrelevantes: Nós manualmente
+                                                                                                                 Título do problema e corpo do problema. A Figura 2 mostra a consulta final.
+       analisou os repositórios de cada um dos 300 sistemas temáticos.
+       no GitHub e investiguei a descrição, o código, o arquivo README,                                          costumávamos filtrar problemas de desempenho de acesso a dados onde “|”
+                                                                                                                                                       “     ”
+                                                                                                                                                          +
+                                                                                                                 representa o operador OU e representa o operador E.
+       e questões para compreender sua funcionalidade e relevância.
+                                                                                                                 Obtivemos 3760 problemas dos sistemas baseados em NoSQL e
+       para o nosso estudo como sistemas de uso intensivo de dados. Também filtramos
+                                                                                                                 2645 problemas relacionados a sistemas poliglota baseados em persistência.
+       repositórios com descrições em idiomas diferentes do inglês foram ignorados por
+       o Langdetect. Após essa filtragem, os 75 NoSQL restantes
+       sistemas baseados em uso intensivo de dados e 87 sistemas de persistência poliglota baseados em
+                                                                                                                 C. RQ1 Taxonomia de problemas de desempenho de acesso a dados
+       Sistemas com uso intensivo de dados foram selecionados como sistemas de estudo, 162
+       No total. A lista dos nossos sistemas de disciplinas está disponível em                                          Utilizamos uma abordagem de codificação aberta para elaborar a taxonomia dos
+       pacote de replicação [39].                                                                                problemas de desempenho de acesso a dados. Dois autores irão
+           5) Coletar problemas: Para cada um dos 162 sistemas temáticos,                                        participar na rotulagem. Aproveitamos a pontuação de relevância.
+       Coletamos todos os problemas de seus repositórios do GitHub usando                                        obtido do Elasticsearch para resolver o problema de desempenho
+       PyGithub5 , que fornece um wrapper em Python para o GitHub.                                               Conjunto de dados do mais relevante ao menos relevante. A relevância.
+       API REST6        . Para cada edição, coletamos o título, o corpo do texto,                                A pontuação mede a relevância dos tópicos para a consulta de pesquisa.
+       Número da edição, URL, estado, hora de criação, comentários, etiquetas,                                   Em seguida, realizamos a rotulagem do conjunto de dados ordenado em múltiplas etapas.
+
+       e o horário de encerramento, caso o problema esteja resolvido. Já que queremos                            rodadas com 100 rótulos por rodada até a saturação de rótulos
+       Investigar as soluções propostas para mitigar os problemas, nós                                           alcançado. Para minimizar o impacto do viés do pesquisador, atribuímos
+       estão interessados apenas em questões já resolvidas. Coletamos um total de                                as questões para cada autor sob a restrição de que cada questão
+
+       526.672 problemas resolvidos de sistemas baseados em NoSQL e 257.840                                      será revisado por dois autores. Além disso, cada autor irá
+       questões resolvidas dos sistemas poliglota baseados em persistência e                                     terão a oportunidade de rotular cada problema de forma independente e resolvê-lo.
+       armazenou-os no banco de dados Elasticsearch. A Tabela I fornece os                                       Os conflitos de rotulagem são resolvidos através de discussões entre os próprios usuários. Nós utilizamos
+
+       média, desvio padrão e o resumo de cinco números do                                                       a lista de antipadrões de desempenho [8] como ponto de partida e continue
+       número de estrelas, número de forks, tamanho do código e número de                                        Adicionando novas etiquetas à medida que continuamos a etiquetagem.
+
+       Questões encerradas para nossos sistemas de assunto candidatos.                                                  Assim que a saturação da rotulagem ocorrer, todos os autores participarão.
+                                                                                                                 na construção da taxonomia do zero usando o cartão
+       B. Extração de Dados
+                                                                                                                 abordagem de classificação para chegar à taxonomia de dados
+           Nesta subseção, discutiremos o procedimento que seguimos para
+                                                                                                                 problemas de desempenho de acesso. Aproveitando o resultado disso
+       problemas de desempenho de acesso a dados filtrados a partir dos 526 mil coletados
+                                                                                                                 Em relação à questão de pesquisa, discutiremos as diferenças entre
+                                                                                                                 As causas principais do acesso a dados baseado em SQL e em NoSQL
+          4https://pypi.org/project/langdetect/
+          5https://pygithub.readthedocs.io/en/latest/index.html                                                  antipadrões de desempenho e as razões subjacentes por trás deles
+          6https://docs.github.com/en/rest                                                                       a diferença.
+Machine Translated by Google
+
+
+
+       D. Pesquisa com desenvolvedores RQ2                                                                                                              TABELA II
+                                                                                                                          MODELO PROVISÓRIO DE ESTRUTURA DE LEVANTAMENTO
+          Após identificarmos a taxonomia de problemas de desempenho de acesso
+                                                                                         Título da seção                            Contente
+       a dados a partir da RQ1, o próximo passo é investigar os problemas de
+                                                                                                                                    - Resumo da descrição da pesquisa, o papel dos participantes e o termo de consentimento livre e
+       desempenho relevantes para os desenvolvedores de sistemas com uso                 1           Introdução
+                                                                                                                                    esclarecido a ser aceito/recusado pelos participantes
+                                                                                                                                    da pesquisa. Os participantes terão acesso à seção restante caso optem por participar da pesquisa. 1.
+       intensivo de dados. Planejamos utilizar uma pesquisa para coletar o feedback                                                 Antipadrão nº 1 - descrição - classificação
+                                                                                                                                    (Não crítico (1) a
+                                                                                                                                    Altamente
+       dos desenvolvedores sobre a taxonomia proposta de problemas de desempenho                                                    crítico (5))
+                                                                                         2                                          - Comentários (opcional)
+       de acesso a dados em sistemas NoSQL. A pesquisa consistirá em perguntas                       Categoria de antipadrão nº 1
+                                                                                                                                    2. Antipadrão nº 2 - descrição -
+                                                                                                                                    classificação (Não crítico (1) a Altamente crítico (5))
+       sobre informações pessoais, como experiência em desenvolvimento de                                                           - Comentários (opcional)
+                                                                                                                                    ...
+
+       software, linguagem de programação preferida e função dos desenvolvedores                                                    1. Antipadrão nº 1 -
+                                                                                                                                    descrição do antipadrão -
+                                                                                                                                    classificação (Não crítico (1) a Altamente crítico (5)) (escala Likert)
+       em suas organizações ou projetos. Isso nos ajudará a traçar o perfil da           3           Categoria de antipadrão nº 2   - Comentários (opcional)
+                                                                                         ...         ...                            2. Antipadrão nº 2 - descrição -
+       experiência e conhecimento profissional dos respondentes. Também                                                             classificação (Não crítico (1) a Altamente crítico (5))
+                                                                                                                                    - Comentários (opcional)
+       apresentaremos cada categoria de problema de desempenho e solicitaremos                                                      ...
+                                                                                                                                    Você gostaria de sugerir outros tipos de antipadrões de desempenho de acesso a dados que não
+                                                                                                     Antipadrões adicionais
+       que avaliem sua relevância de 1 a 5. Além disso, incluiremos um espaço para                                                  foram mencionados nas seções anteriores? (Pergunta aberta, opcional)
+                                                                                                                                    Quantos anos de experiência você tem em desenvolvimento de software?
+                                                                                                                                    Quantos anos de experiência você tem em desenvolvimento de código
+       comentários opcionais e uma pergunta aberta para que os respondentes                                                         back-end e acesso a banco de dados?
+                                                                                                     Dados demográficos
+                                                                                                                                    Quais frameworks de acesso (persistência) a banco de dados, se
+       mencionem novas categorias de problemas de desempenho.                                                                       houver, você utiliza para desenvolvimento?
+                                                                                                                                    Informações pessoais (e-mail) (opcional)
+          1) Seleção dos participantes da pesquisa: Nossos critérios de inclusão
+       exigem que os desenvolvedores tenham pelo menos um ano de experiência
+       em desenvolvimento industrial com bancos de dados NoSQL ou sistemas de
+                                                                                               3) Repetimos a etapa anterior em várias rodadas até atingirmos a saturação
+       persistência poliglota. Utilizaremos o LinkedIn7 como plataforma para recrutar
+                                                                                                   dos rótulos.
+       os participantes da pesquisa. Inicialmente, compilaremos uma lista de palavras-
+                                                                                               4) Organizamos uma sessão de classificação de cartões para categorizar e
+       chave que nos ajudarão a encontrar desenvolvedores de sistemas NoSQL e
+                                                                                                    agrupar os rótulos a fim de construir a taxonomia. Seremos capazes de
+       sistemas de persistência poliglota com uso intensivo de dados. Em seguida,
+                                                                                                    responder à RQ1 após concluir esta etapa.
+       utilizaremos as palavras-chave para buscar os perfis dos desenvolvedores e
+                                                                                               5) Assim que concluirmos a RQ1, preparamos o questionário da pesquisa e
+       analisaremos manualmente os perfis dos participantes correspondentes, caso
+                                                                                                    começamos a recrutar os participantes usando uma abordagem de
+       sua experiência seja relevante para o nosso estudo, conforme os critérios de
+                                                                                                    amostragem por conveniência.
+       inclusão. Também incluiremos como participantes da pesquisa colaboradores
+                                                                                               6) Obteremos a aprovação ética para a realização do levantamento junto à
+       envolvidos no desenvolvimento dos sistemas em questão. Planejamos oferecer
+                                                                                                    autoridade competente.
+       uma recompensa por sorteio entre os participantes que concluírem a pesquisa.
+                                                                                               7) Compartilharemos a pesquisa com os candidatos que deram seu
+       Esperamos receber pelo menos 40 respostas completas antes de encerrar a
+                                                                                                    consentimento para participar da pesquisa.
+       pesquisa.
+                                                                                               8) Assim que obtivermos as respostas da pesquisa, realizaremos análises
+          A Tabela II apresenta a estrutura provisória do questionário da pesquisa.
+                                                                                                    quantitativas e qualitativas das respostas candidatas para responder à
+       A pesquisa começa com uma apresentação do estudo e a solicitação do
+                                                                                                    RQ2.
+       consentimento livre e esclarecido dos participantes. As seções seguintes
+       contêm os antipadrões associados a cada categoria de alto nível, suas                                                V. LIMITAÇÕES DO ESTUDO
+       descrições e uma escala Likert de avaliação da criticidade de cada antipadrão.
+                                                                                                Uma das limitações internas deste estudo seria identificar e abranger todos
+       A escala varia de: Não crítico (1) a Altamente crítico (5). Em seguida,
+                                                                                         os antipadrões de desempenho em sistemas de acesso a dados. Estamos
+       solicitaremos comentários adicionais opcionais sobre o problema. Planejamos
+                                                                                         considerando sistemas de código aberto para nossos estudos. Embora
+       ter uma seção para cada categoria de alto nível. Depois, daremos aos
+                                                                                         tenhamos selecionado sistemas com uso intensivo de dados e um número
+       participantes a oportunidade de mencionar novos tipos de antipadrões de
+                                                                                         elevado de problemas, e analisado cuidadosamente as informações disponíveis
+       desempenho por meio de uma pergunta aberta opcional. Finalizamos a
+                                                                                         para cada um deles, ainda existe a possibilidade de não identificarmos alguns
+       pesquisa com a coleta de informações demográficas, como a experiência dos
+                                                                                         antipadrões de desempenho específicos que não foram experimentados pelos
+       participantes em desenvolvimento de software e desenvolvimento de código
+                                                                                         sistemas selecionados. Além disso, ao estudarmos com sistemas de código
+       de acesso a dados.
+                                                                                         aberto, não podemos garantir que os resultados do nosso estudo serão os
+                                IV. PLANO DE EXECUÇÃO
+                                                                                         mesmos para sistemas de uso intensivo de dados em nível industrial. Para
+          Neste trabalho, apresentamos nosso plano de execução para responder            mitigar essa limitação, planejamos realizar um estudo abrangente com
+       às questões de pesquisa. Atualmente, concluímos as etapas de coleta e             desenvolvedores. Pretendemos garantir a participação de pelo menos 40
+       extração de dados do método de estudo. Portanto, descreveremos a seguir os        desenvolvedores, que devem possuir experiência significativa com código de
+       passos que planejamos seguir para responder às questões de pesquisa.              acesso a dados e desenvolvimento de back-end. Assim como os autores, os
+                                                                                         desenvolvedores terão a oportunidade de adicionar novos rótulos de antipadrões
+         1) Preparamos e testamos uma ferramenta online para nos auxiliar no
+                                                                                         de desempenho com base em seus conhecimentos e experiência.
+             processo de rotulagem.
+         2) Iniciamos a primeira rodada de rotulagem independente usando a
+             ferramenta de rotulagem e realizamos uma discussão para resolver
+             conflitos e chegar a um consenso sobre a rotulagem.
+                                                                                                Além disso, existe a probabilidade de alguns problemas potenciais de desempenho no
+         7https://www.linkedin.com/                                                      acesso aos dados passarem despercebidos, uma vez que esses problemas não foram identificados.
+Machine Translated by Google
+
+
+
+       Os sistemas selecionados foram aqueles que apresentaram os 162                                  [12] D. Johannes, F. Khomh e G. Antoniol, “Um estudo empírico em larga escala de code
+       melhores problemas. A seleção dos sistemas em questão baseou-se nos                                    smells em projetos javascript”, Software Quality Journal, pp. 1– 44, 2019.
+
+       critérios descritos na coleta de dados, especificamente na categoria "seleção                   [13] F. Palomba, G. Bavota, M. Di Penta, F. Fasano, R. Oliveto e A. De Lucia, “Sobre a difusão
+       de repositórios com o maior número de problemas". Para mitigar essa                                   e o impacto na manutenibilidade de code smells: uma investigação empírica em larga
+       limitação, planejamos oferecer aos desenvolvedores que participarão da                                escala”, Empirical Software Engineering, vol. 23, nº 3, pp. 1188–1221, 2018.
+
+       pesquisa a oportunidade de adicionar rótulos de antipadrões de
+                                                                                                       [14] M. Iammarino, F. Zampetti, L. Aversano e M. Di Penta, “Ações de remoção e refatoração
+                                                                                    de e
+       desempenho de acesso a dados não listados, com base em seu próprio conhecimento   experiência.
+                                                                                       dívida técnica autoadmitidas: Co-ocorrência ou mais?” em 2019 IEEE International
+          Outra limitação interna poderia ser garantir a seleção adequada de                                 Conference on Software Maintenance and Evolution (ICSME). IEEE, 2019, pp. 186–
+                                                                                                             190.
+       questões dos sistemas em estudo.                                                                [15] FG de Almeida Filho, ADF Martins, T. d. S. Vinuto, JM Monteiro, ´IP de Sousa, J. de Castro
+       É evidente que nem todos os problemas estão relacionados a antipadrões de desempenho                  Machado, and LS Rocha, “Prevalence of bad smells in pl/sql projects,” in Proceedings of the
+
+       no acesso a dados. Além disso, alguns problemas possuem descrições inadequadas. Para                  27th International Conference on Program Comprehension. IEEE Press, 2019, pp. 116– 121.
+
+       mitigar esse desafio, decidimos realizar a rotulagem manual dos problemas, com a aprovação
+       mútua de todos os autores e verificação adequada em diversas rodadas. Adicionalmente,           [16] BA Muse, C. Nagy, A. Cleve, F. Khomh e G. Antoniol, “Fixme: Sincronizar com banco de
+       validaremos os antipadrões de desempenho identificados e listados com os desenvolvedores.              dados: um estudo empírico de dívida técnica autoadmitida de acesso a dados”, arXiv
+                                                                                                              preprint arXiv:2201.02180, 2022.
+                                                                                                       [17] BA Muse, F. Khomh e G. Antoniol, “Os desenvolvedores refatoram o código de acesso a
+                                                                                                             dados? um estudo empírico”, arXiv preprint arXiv:2202.03270, 2022.
+          Uma das limitações externas do nosso estudo pode ser a seleção de
+                                                                                                       [18] M. Kleppmann, Projetando aplicações intensivas em dados: As grandes ideias por trás de
+       desenvolvedores experientes. Para garantir a imparcialidade e a qualidade
+                                                                                                              sistemas confiáveis, escaláveis e de fácil manutenção.        “O'Reilly Media, Inc.”,
+       do estudo, planejamos selecionar os desenvolvedores com base na                                        2017.
+                                                                                                               ´                                        ´
+       experiência declarada com sistemas de acesso a dados e na disposição                            [19] A. Vathy-Fogarassy e T. Hugy ak, “Plataforma de acesso a dados uniforme para sistemas
+                                                                                                              de banco de dados SQL e NoSQL”, Sistemas de Informação, vol. 69, pp. 93– 105, 2017.
+       em participar. Como primeiro passo, decidimos enviar convites aos
+       desenvolvedores pelo LinkedIn.                                                                  [20] P. Benats, M. Gobert, L. Meurice, C. Nagy e A. Cleve, “Um estudo empírico de modelos
+                                                                                                              de banco de dados (multi) em projetos de código aberto”, em Conferência Internacional
+                                                                                                              sobre Modelagem Conceitual. Springer, 2021, pp. 87–101.
+
+                                           REFERÊNCIAS                                                 [21] B. Karwin, Antipadrões SQL: Evitando as armadilhas dos programas de banco de dados-
+                                                                                                             ming. Pragmatic Bookshelf, 2010.
+        [1] M. Naeem, T. Jamal, J. Diaz-Martinez, SA Butt, N. Montesano, MI.                           [22] C. Nagy e A. Cleve, “Um detector estático de cheiro de código para consultas SQL
+             Tariq, E. De-la Hoz-Franco e E. De-La-Hoz-Valdiris, “Tendências e desafios de                    incorporadas em código Java”, em 2017 IEEE 17th International Working Conference
+             perspectivas futuras em big data”, em Advances in Intelligent Data Analysis and                  on Source Code Analysis and Manipulation (SCAM). IEEE, 2017, pp. 147–152.
+             Applications. Springer, 2022, pp. 309–325.
+        [2] B. Park, DL Rao e VN Gudivada, “Perigos de viés em sistemas de informação intensivos       [23] P. Khumnin e T. Senivongse, “Detecção de antipadrões SQL e processo de refatoração
+              em dados”, em Next Generation Information Processing System, P. Deshpande, A.                   de banco de dados”, em 2017 18ª Conferência Internacional IEEE/ACIS sobre
+              Abraham, B. Iyer e K. Ma, Eds.                                                                  Engenharia de Software, Inteligência Artificial, Redes e Computação Paralela/
+              Singapura: Springer Singapore, 2021, pp. 259–271.                                               Distribuída (SNPD), junho de 2017, pp. 199–205.
+        [3] A. Cleve, T. Mens e J. Hainaut, “Evolução de sistemas com uso intensivo de dados”,         [24] T. Sharma, M. Fragkoulis, S. Rizou, M. Bruntink e D. Spinellis, “Relações fedorentas:
+              Computador, vol. 43, nº 8, pp. 110–112, 2010.                                                    Medindo e entendendo a qualidade do esquema do banco de dados”, em 2018 IEEE/
+        [4] H. Foidl, M. Felderer e S. Biffl, “Dívida técnica em sistemas de software intensivos em           ACM 40th International Conference on Software Engineering: Software Engineering in
+             dados”, em 2019 45ª Conferência Euromicro sobre Engenharia de Software e                         Practice Track (ICSE-SEIP), maio de 2018, pp. 55–64.
+             Aplicações Avançadas (SEAA), 2019, pp. 338–341.
+        [5] O. Hummel, H. Eichelberger, A. Giloj, D. Werle e K. Schmid, “Uma coleção de desafios       [25] C. Nagy e A. Cleve, “SQLInspect: Um analisador estático para inspecionar o uso do banco
+             de engenharia de software para desenvolvimento de sistemas de big data”, em 2018                 de dados em aplicações Java”, em Anais da 40ª Conferência Internacional de
+             44ª Conferência Euromicro sobre Engenharia de Software e Aplicações Avançadas                    Engenharia de Software: Anais Complementares.
+             (SEAA), 2018, pp. 362–369.                                                                      ACM, 2018, pp. 93–96.
+        [6] E. Tom, A. Aurum e R. Vidgen, “Uma exploração da dívida técnica”,                          [26] G. Jin, L. Song, X. Shi, J. Scherpelz e S. Lu, “Understanding and detecting real-world
+              Revista de Sistemas e Software, vol. 86, nº 6, pp. 1498–1516, 2013.                             performance bugs,” ACM SIGPLAN Notices, vol. 47, no. 6, pp. 77–88, 2012.
+        [7] BA Muse, MM Rahman, C. Nagy, A. Cleve, F. Khomh e G. Antoniol, “Sobre a prevalência,
+             impacto e evolução de códigos SQL de mau gosto em sistemas de uso intensivo de            [27] A. Nistor, T. Jiang e L. Tan, “Descobrindo, relatando e corrigindo bugs de desempenho”,
+             dados”, em Anais da 17ª Conferência Internacional sobre Mineração de Repositórios                em 2013 10ª conferência de trabalho sobre mineração de repositórios de software
+             de Software, 2020, pp. 327–338.                                                                  (MSR). IEEE, 2013, pp. 237–246.
+        [8] S. Shao, Z. Qiu, X. Yu, W. Yang, G. Jin, T. Xie e X. Wu, “Antipantados de desempenho       [28] Y. Liu, C. Xu e S.-C. Cheung, “Caracterização e detecção de bugs de desempenho para
+              de acesso a banco de dados em aplicações web com suporte de banco de dados”, em                 aplicativos de smartphone”, em Anais da 36ª conferência internacional sobre engenharia
+              2020 IEEE International Conference on Software Maintenance and Evolution (ICSME).               de software, 2014, pp. 1013–1024.
+             IEEE, 2020, pp. 58–69.                                                                    [29] J. Yang, C. Yan, P. Subramaniam, S. Lu e A. Cheung, “Como não estruturar seus
+        [9] F. Khomh, M. Di Penta e Y.-G. Gueheneuc, “Um estudo exploratório do impacto de code                aplicativos web com suporte de banco de dados: um estudo de bugs de desempenho
+              smells na propensão a mudanças de software”, em 2009 16ª Conferência de Trabalho                 na vida real”, em 2018 IEEE/ACM 40th International Conference on Software Engineering
+              sobre Engenharia Reversa. IEEE, 2009, pp. 75–84.                                                 (ICSE). IEEE, 2018, pp. 800–810.
+       [10] FA Fontana, V. Ferme, A. Marino, B. Walter e P. Martenka, “Investigating the impact of     [30] M. Selakovic e M. Pradel, “Problemas de desempenho e otimizações em javascript: um
+             code smells on system's quality: An empirical study on systems of different application         estudo empírico”, em Anais da 38ª Conferência Internacional de Engenharia de
+             domains,” in 2013 IEEE International Conference on Software Maintenance, Sep. 2013,              Software, 2016, pp. 61–72.
+             pp. 260–269.                                                                              [31] A. Nistor, L. Song, D. Marinov e S. Lu, “Toddler: Detectando problemas de desempenho
+                                                                                                              por meio de padrões de acesso à memória semelhantes”, em 2013 35ª Conferência
+       [11] A. Yamashita e L. Moonen, “Explorando o impacto das relações inter-smell na                       Internacional de Engenharia de Software (ICSE). IEEE, 2013, pp. 562–571.
+              manutenibilidade do software: um estudo empírico”, em Anais da Conferência
+              Internacional de Engenharia de Software de 2013, série ICSE '13. IEEE Press, 2013,       [32] T.-H. Chen, W. Shang, ZM Jiang, AE Hassan, M. Nasser e P. Flora, “Detecção de
+             p. 682–691.                                                                                      antipadrões de desempenho para aplicações desenvolvidas
+Machine Translated by Google
+
+
+
+              usando mapeamento objeto-relacional”, em Anais da 36ª Conferência Internacional de
+              Engenharia de Software, 2014, pp. 1001–1012.
+       [33] ——, “Finding and evaluating the performance impact of redundant data access for applications
+              that are developed using objectrelational mapping frameworks,” IEEE Transactions on
+              Software Engineering, vol. 42, no. 12, pp. 1148–1161, 2016.
+
+
+       [34] J. Yang, C. Yan, P. Subramaniam, S. Lu e A. Cheung, “Powerstation: Detecção e correção
+              automáticas de ineficiências de aplicações web com suporte de banco de dados em IDE”,
+              em Anais da 26ª Reunião Conjunta da ACM sobre Engenharia de Software Europeia e
+              Simpósio sobre os Fundamentos da Engenharia de Software, 2018, pp. 884–887.
+
+
+       [35] IT Bowman e K. Salem, “Otimização de fluxos de consulta usando pré-busca semântica”, ACM
+              Transactions on Database Systems (TODS), vol. 30, nº 4, pp. 1056–1101, 2005.
+
+
+       [36] A. Cheung, O. Arden, S. Madden e AC Myers, “Particionamento automático de aplicações de
+              banco de dados”, arXiv preprint arXiv:1208.0271, 2012.
+
+
+       [37] X. Xiao, S. Han, D. Zhang e T. Xie, “Context-sensitive delta inference for identifying workload-
+              dependent performance bottlenecks,” in Proceedings of the 2013 International Symposium
+              on Software Testing and Analysis, 2013, pp. 90–100.
+
+
+       [38] T.-H. Chen, W. Shang, AE Hassan, M. Nasser e P. Flora, “Cacheoptimizer: Ajudando
+              desenvolvedores a configurar estruturas de cache para aplicações web centradas em banco
+              de dados baseadas em Hibernate”, em Anais do 24º Simpósio Internacional ACM SIGSOFT
+              sobre Fundamentos de Engenharia de Software, 2016, pp. 666–677.
+
+
+       [39] BA Muse, “Pacote de replicação”, 2022.                                               [On-line].
+              Disponível em: https://github.com/Biruk-Asmare/data access performance antipatterns in
+              data intensive systems RR.git
+

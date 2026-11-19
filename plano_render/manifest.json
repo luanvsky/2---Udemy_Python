@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "libreoffice",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\Plano_de_Ensino_Michel_ES_PROCC.doc",
+  "sourceSha256": "5763f43eb29a90bb1a6b1328e43b26fef19dd623ae55ed3105d9f6a862f99e67",
+  "dpi": 144,
+  "pageCount": 3,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\plano_render\\page-0001.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 216214
+    }
+  ],
+  "missingFonts": []
+}

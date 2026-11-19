@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\Art_5_-_SwArchitectureTraveloguePT.pdf",
+  "sourceSha256": "7d456cd65da62f4031d16db43bb18a161d1e6e09802996392a2bf4ad03d930bc",
+  "dpi": 144,
+  "pageCount": 11,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\art5_render\\page-0001.png",
+      "width": 1224,
+      "height": 1584,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 426704
+    }
+  ],
+  "missingFonts": []
+}

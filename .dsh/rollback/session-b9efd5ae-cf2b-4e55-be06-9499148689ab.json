@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "sessionId": "session-b9efd5ae-cf2b-4e55-be06-9499148689ab",
+  "cwd": "D:\\dsh-vsky",
+  "updatedAt": 1790397153647,
+  "checkpoints": [
+    {
+      "turn": 1,
+      "commit": "93c0f7ab607307647e79dc2948e1d73f62ea5fc7",
+      "time": 1790396287919,
+      "untracked": [],
+      "truncated": false,
+      "after": {
+        "commit": "bdc3b0cd55f52ed1c1d2b28fb4e34d83489399a5",
+        "time": 1790397152319
+      }
+    }
+  ],
+  "rolls": [],
+  "undos": []
+}

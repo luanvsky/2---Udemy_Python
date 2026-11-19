@@ -1,0 +1,599 @@
+     Universidade Federal de Sergipe — UFS
+     PROCC — Programa de Pós-Graduação em Ciência da Computação
+
+
+
+
+     O Paradigma Data-Intensive
+     e Limites Físicos
+     Aula 02
+     Gargalos de E/S, Física das Latências, Fluxos Bounded/Unbounded e o Axioma do Log
+
+
+
+
+               Prof. Dr. Fabio Gomes Rocha
+               Docente / Pesquisador PROCC
+
+
+
+
+Sistemas Intensivos em Dados e Microsserviços                                            PROCC / UFS — Aula 02
+Organização
+
+
+
+
+   Bloco 1: Paradigma DIS               Bloco 2: Física de I/O                 Bloco 3: Velocidade                    Bloco 4: Estado & Prática
+   Compute vs. Data-Intensive, blocos   Latências de Jeff Dean, árvores LSM,   Datasets Bounded (Batch) vs.           O Axioma do Log, Spark vs. Flink e o
+   de construção e modelos de           Write Ampliﬁcation (WAF),              Unbounded (Streams), saturação de      exercício de dimensionamento
+   escalabilidade física                compacção de SSTables e pausas         ﬂuxo, Drop, Buffers em RAM vs. Log e   Back-of-the-Envelope para SIEM de
+   (Shared-Memory, Shared-Disk e        não-determinísticas (GC/Swap).         Backpressure.                          100M logs/dia.
+   Shared-Nothing).
+
+
+
+
+Visão Panorâmica                                                                                                                                             Slide 3
+                                                               Bloco 01
+
+                                   O Paradigma Data-Intensive
+                           Compreendendo a transição dos limites de computação (CPU-bound) para os limites de
+                                          transferência e armazenamento de dados (I/O-bound).
+
+
+
+
+Bloco 1: Fundamentos DIS                                                                                        Slide 4
+Compute-Intensive vs. Data-Intensive
+
+
+
+   Dimensão              Compute-Intensive (Sistemas em Computação)           Data-Intensive (Sistemas em Dados - DIS)
+
+
+                                                                              Largura de banda de barramento de disco, RAM e
+   Gargalo Primário Ciclos de CPU / Unidades Matriciais (GPUs, TPUs)
+                                                                              rede (I/O-Bound)
+
+
+   Domínio de            Simulações moleculares, modelos climáticos,          SIEM, e-commerce global, redes sociais, telemetria
+   Aplicação             criptograﬁa, HPC                                     IoT em larga escala
+
+
+   Arquitetura           Supercomputadores com interconexões                  Clusters de Commodity Hardware interconectados
+   Física                proprietárias (RDMA, InﬁniBand)                      via rede IP padrão
+
+
+   Tratamento de                                                              Falhas parciais tratadas continuamente como
+                         Checkpoints globais síncronos periódicos de estado
+   Falhas                                                                     norma no software
+
+
+
+
+Taxonomia dos Sistemas                                                                                                      Slide 5
+Blocos de Construção de um DIS
+
+
+                                                                                               
+ Bancos de Dados                    Caches em Memória            Índices de Busca                 Streams & Filas
+ Persistência conﬁável de           Armazenamento volátil de     Estruturas de dados auxiliares   Canais assíncronos
+ estado para recuperação            altíssima velocidade para    (ex: índices invertidos) que     desacoplados no tempo para
+ íntegra no futuro, garantindo      atenuar a carga nos bancos   aceleram ﬁltragens complexas     ingestão, amortecimento e
+ durabilidade contra falhas         principais em leituras       sem varredura total de disco.    distribuição elástica de ﬂuxos
+ físicas de nós.                    repetitivas.                                                  contínuos.
+
+
+
+
+     Componentização Arquitetural
+                                                                                                                         Slide 6
+As Três Dimensões da Complexidade
+
+
+
+                                                                                        
+
+    1. Volume                                2. Velocidade                               3. Variabilidade
+    Quando a escala ultrapassa terabytes e   A taxa de ingestão de eventos               O formato e a semântica dos dados
+    petabytes, excedendo a capacidade        aproxima-se dos limites de saturação        mudam dinamicamente, exigindo
+    física de armazenamento e indexação de   física de barramentos de I/O e interfaces   suporte a esquemas ﬂexíveis e
+    uma única máquina.                       de rede.                                    consistência de estado.
+
+
+
+
+Vetores de Complexidade                                                                                                      Slide 7
+Escalabilidade: Modelos Físicos
+
+
+
+
+      Scale-Up (Shared-Memory)                                                            Scale-Out (Shared-Nothing)
+    • Múltiplas CPUs e gigabytes/terabytes de RAM sob um único Sistema                 • Cada nó possui sua própria CPU, RAM e disco físico independente.
+    Operacional.                                                                       • Toda a coordenação ocorre a nível de software através de comunicação IP em
+    • Limitação: Custo exponencial; limite físico de barramento interno e gargalo de   rede.
+    acesso à memória (NUMA).                                                           • Vantagem: Escalabilidade horizontal linear com hardware comum e tolerância
+    • Ponto único de falha física (SPOF).                                              natural a falhas.
+
+
+
+
+Engenharia de Infraestrutura                                                                                                                                      Slide 8
+O Fenômeno NUMA em Scale-Up
+
+
+
+
+     Acesso Local vs. Remoto: Em placas multi-socket, acessar a RAM do processador
+     local é muito mais rápido do que acessar a RAM do processador vizinho.
+                                                                                       Por que Shared-Nothing Venceu?
+     Interconexão Saturada: A troca de dados através do barramento de interconexão
+                                                                                     Ao desacoplar completamente os nós, o modelo Shared-Nothing elimina travas de
+     (QPI/UPI) gera contenção severa em alta concorrência.
+                                                                                     hardware centralizadas e permite que cada máquina processe partições
+     Retornos Decrescentes: Dobrar o número de núcleos em uma única máquina          independentes de dados sem disputa de barramento.
+     física não dobra a vazão do banco de dados.
+
+
+
+
+Limites de Hardware (NUMA)                                                                                                                                       Slide 9
+                                                                 Bloco 02
+
+
+
+                         A Física das Latências e Gargalos de E/S
+                          A escala de tempo do hardware, o custo astronômico dos acessos a disco e a mecânica das
+                                                   estruturas de armazenamento NoSQL.
+
+
+
+
+Bloco 2: Física de I/O                                                                                              Slide
+                                                                                                                    10
+A Escala das Latências Físicas
+
+
+
+
+ Operação de Hardware                   Tempo Real              Escala Humana Relativa (1 ns = 1 segundo)
+
+ Acesso ao Cache L1                     0.5 ns                  0.5 segundo (uma piscada)
+
+
+ Acesso à Memória RAM Principal         100 ns                  1.6 minutos (200× mais lento que L1)
+
+
+ Leitura Sequencial de 1 MB da RAM      250 µs                  ~ 3 dias
+
+
+ Acesso Aleatório em Disco SSD          16 µs                   ~ 4.4 horas
+
+
+ Busca de Cabeça em Disco HDD (Seek)    10 ms (10.000.000 ns)   ~ 3.8 meses (100.000× mais lento que a RAM!)
+
+
+ Viagem de Rede (Califórnia ↔ Europa)   150 ms                  ~ 4.7 anos
+
+
+
+
+Latências de Jeff Dean                                                                                         Slide 11
+A Física do Armazenamento em SSDs
+
+
+
+
+     Páginas vs. Blocos                                                                    Desgaste das Células Flash
+   • SSDs realizam leituras e escritas na granularidade de páginas (ex: 4 KB a 16 KB).   • Cada célula suporta um número ﬁnito de ciclos de escrita e apagamento (P/E
+
+   • No entanto, operações de apagamento só podem ser executadas em blocos               cycles).
+
+   inteiros (ex: 2 MB a 8 MB).                                                           • A controladora executa Wear Leveling e coleta de lixo interna contínua.
+
+   • Sobrescrever dados exige ler o bloco, modiﬁcar a página e regravar o bloco em       • Cargas massivas de gravação aceleram o desgaste prematuro dos discos em
+   outro local físico.                                                                   datacenters.
+
+
+
+
+Mecânica de SSDs                                                                                                                                                     Slide 12
+Write Ampliﬁcation Factor (WAF)
+
+
+
+
+                     WAF
+                  Ampliﬁcação de Escrita
+                                           • Se o software grava 1 GB de logs e o mecanismo de compacção/LSM grava 3.5 GB físicos
+                                           nas células ﬂash, temos um .
+                                           • Consequências: redução drástica da vida útil do SSD e saturação do barramento de I/O
+                                           durante picos de escrita.
+
+
+
+
+Métricas de I/O                                                                                                             Slide 13
+Árvores LSM e SSTables
+
+
+
+
+   1. MemTable (RAM)                                     2. Commit Log (WAL)                              3. SSTables (Disco)
+   As escritas chegam primeiro em uma estrutura          Simultaneamente, o evento é gravado de forma     Quando a MemTable enche, ela é despejada (ﬂushed)
+   ordenada na memória RAM (SkipList / Red-Black Tree)   estritamente sequencial (append-only) em disco   para o disco como um arquivo imutável e ordenado
+   para resposta ultrarrápida.                           para recuperação contra quedas.                  por chave.
+
+
+
+
+Estruturas de Dados NoSQL                                                                                                                                Slide 14
+Compacção de Logs e Latência de Cauda
+
+
+
+
+      Mesclagem de SSTables: Em segundo plano, o banco mescla múltiplos arquivos
+      antigos para descartar chaves sobrescritas ou apagadas (*Tombstones*).
+                                                                                           Por que o p99 Importa em Microsserviços?
+      Disputa por Barramento: O processo de compacção consome alta largura de
+                                                                                         Uma única página web corporativa pode disparar 100 chamadas paralelas a
+      banda de I/O em paralelo com as consultas dos clientes.
+                                                                                         microsserviços. Se um único serviço sofrer lentidão por compacção de I/O, a
+      Picos no Percentil 99.9 ($P_{99.9}$): Usuários sofrem lentidão esporádica súbita   requisição do usuário ﬁnal será tão lenta quanto o serviço mais lento.
+      quando suas leituras coincidem com ciclos intensos de compacção.
+
+
+
+
+Tail Latency Engineering                                                                                                                                               Slide 15
+Pausas Não-Determinísticas
+
+
+
+
+   Garbage Collection (GC)                             Memory Thrashing & Swap                                Steal Time na Nuvem
+   Pausas do tipo Stop-the-World congelam todas as     Ao esgotar a RAM física, o SO pagina dados no disco,   Hipervisores multitenant suspendem
+   threads da JVM por centenas de milissegundos para   consumindo 100% dos ciclos de I/O apenas               temporariamente a VM para realocar CPU física a
+   liberar memória heap.                               movendo blocos de memória.                             outros clientes vizinhos.
+
+
+
+
+Anomalias Operacionais                                                                                                                                          Slide 16
+                                                                  Bloco
+                                                                    03
+
+
+                           Velocidade: Bounded vs. Unbounded
+                            Do processamento em lote para o ﬂuxo contínuo de eventos, controle de saturação e
+                                                 estratégias de resiliência em tempo real.
+
+
+
+
+Bloco 3: Fluxos de Dados                                                                                        Slide 17
+Bounded vs. Unbounded
+
+
+
+
+ Característica       Dataset Bounded (Limitado / Batch)                      Dataset Unbounded (Ilimitado / Streaming)
+
+ Extensão Temporal    Tamanho ﬁxo, discreto e imutável                        Inﬁnito, contínuo e incremental
+
+
+ Ordenação Global     Viável através de leitura total (*Sort-Merge Joins*)    Matematicamente impossível sem discretização por janelas
+
+
+ Processamento        Trabalho com início, meio e ﬁm deﬁnidos                 Processamento ininterrupto rodando por meses/anos
+
+
+ Tecnologias          Apache Spark Batch, Hadoop MapReduce, Data Warehouses   Apache Flink, Apache Kafka Streams, Spark Streaming
+
+
+
+
+Dualidade dos Dados                                                                                                                      Slide 18
+A Impossibilidade da Ordenação Global
+
+
+
+
+                                                            A Barreira Matemática do Sort
+                                                          • Para garantir que o menor elemento de uma coleção ordenada seja emitido
+                                                           primeiro, é estritamente obrigatório inspecionar o último elemento do conjunto.
+
+                                                           • Como um ﬂuxo Unbounded nunca atinge o ﬁm, a ordenação total global pura é
+                                                           indecidível.
+                   Fluxo Inﬁnito
+    Dados contínuos sem um ponto ﬁnal deﬁnido (Unbounded    Solução Arquitetural
+                          Streams)                         Discretizar o ﬂuxo em janelas temporais (Windowing ﬁxo, deslizante ou por sessão).
+
+
+
+
+                                                                                                                                                Slide 19
+Saturação de Fluxo: Três Estratégias
+
+
+
+
+   1. Drop (Descarte)                              2. Buﬀer (Enﬁleiramento)                        3. Backpressure
+   Descarte controlado de mensagens excedentes.    Armazenamento temporário de mensagens em ﬁlas   Sinalização síncrona de controle que força
+   Aplicável apenas quando o dado perde valor em   para amortecer rajadas de tráfego até que os    ativamente os produtores a desacelerar a emissão de
+   milissegundos (ex: pacotes VoIP/vídeo).         consumidores processem a carga.                 novos eventos.
+
+
+
+
+Controle de Fluxo                                                                                                                                 Slide 20
+Filas em RAM vs. Log-Based Streams
+
+
+
+
+ Critério                  Brokers Tradicionais em RAM (AMQP / RabbitMQ)       Streams Baseados em Log (Apache Kafka / Pulsar)
+
+ Armazenamento Primário    Filas mantidas na memória RAM do nó                 Arquivo de log append-only sequencial persistido em disco
+
+
+ Impacto de Histórico      Queda brusca de vazão quando a memória RAM esgota   Vazão perfeitamente estável (armazena 1 GB ou 50 TB)
+
+
+ Modelo de Consumo         Destrutivo (a mensagem é apagada após conﬁrmação)   Não-destrutivo (leitores independentes navegam por ponteiros)
+
+
+ Reprocessamento           Inviável sem reenvio pelo produtor                  Trivial: basta rebobinar os offsets dos consumidores
+
+
+
+
+Engenharia de Mensageria                                                                                                                       Slide 21
+A Mecânica da Backpressure
+
+
+         Controle no Nível de Socket
+ Quando o buffer do consumidor enche, a janela TCP fecha ($Window Size =                        Arquitetura Lambda vs. Kappa
+         0$), impedindo o envio pelo SO do produtor.
+
+                                                                             Lambda
+                                                                             Mantém dois pipelines separados (Batch para precisão e Speed para tempo
+                                                                             real), duplicando as regras de negócio do sistema.
+         Fluxo Reativo no Software
+ Frameworks (ex: Reactive Streams, Akka, Flink) propagam a sinalização de   Kappa
+         volta pela cadeia de serviços.                                      Uniﬁca todo o processamento histórico e em tempo real sobre a mesma
+                                                                             engine de stream através do reprocessamento de logs imutáveis.
+
+
+
+
+         Proteção contra Crash
+ Previne que nós consumidores esgotem a memória heap e entrem em falha
+         por OutOfMemoryError.
+
+
+
+
+Padrões de Fluxo Reativo                                                                                                                               Slide 22
+                                                                               Bloco
+                                                                                 04
+
+
+
+                                          Estado, o Axioma do Log e Falhas
+                                        A relação matemática entre logs imutáveis e bancos de dados, semântica exactly-once e
+                                                                    estratégias de checkpointing.
+
+
+
+
+Bloco 4: Estado e Tolerância a Falhas                                                                                           Slide 23
+Estado Volátil vs. Persistente
+
+
+
+
+       Estado Volátil                                                                     Estado Persistente
+   • Mantido exclusivamente na memória RAM local do processo (tabelas hash,             • Gravado em disco físico, arquivos WAL e mídias duráveis distribuídas.
+   caches efêmeros).                                                                    • Vantagem: Garantias completas de durabilidade e recuperação de falhas.
+   • Vantagem: Latência mínima (nanosegundos) e máxima taxa de transações por
+                                                                                        • Custo: Penalidade de latência de gravação de barramento de I/O em cada
+   segundo.
+                                                                                        mutação.
+   • Risco: Perda total instantânea em caso de crash, reinicialização ou falha física
+   do nó.
+
+
+
+
+Trade-offs de Estado                                                                                                                                               Slide 24
+O Axioma do Log Imutável
+
+
+
+
+                                                        • "A verdade reside no Log; o banco de dados é apenas uma visão materializada e um
+                                     A Verdade no Log   cache do histórico de eventos." (Pat Helland & Martin Kleppmann)
+                                                        • Se o banco de dados for corrompido, o estado pode ser ﬁelmente reproduzido
+                                                        reprocessando o log histórico imutável desde o início.
+
+
+
+
+Fundamento Arquitetural (Kleppmann, 2017)                                                                                              Slide 25
+Microbatching vs. Checkpointing
+
+
+
+
+ Característica           Microbatching (Apache Spark Streaming)                         Checkpointing Contínuo (Apache Flink)
+
+ Modelo de Execução       Divide o ﬂuxo contínuo em mini-lotes discretos (500 ms a 1s)   Processamento orientado a eventos individuais em tempo real
+
+
+ Latência Mínima          100 ms a 500 ms                                                < 10 ms (submilisegundo real)
+
+
+ Tolerância a Falhas      Recalcula o grafo de linhagem RDD do mini-lote                 Injeção de barreiras de checkpoint assíncronas no ﬂuxo
+
+
+ Garantia de Entrega      Semântica At-Least-Once / Exactly-Once                         Semântica Exactly-Once com consistência de estado
+
+
+
+
+Engenharia de Streaming                                                                                                                                Slide 26
+                                                                Atividade
+                                                                  Prática
+
+
+                         Dimensionamento Back-of-the-Envelope
+                           Engenharia de capacidade real: calculando volume de storage, vazão de I/O, largura de
+                                  banda e impacto de ampliﬁcação de escrita para um SIEM corporativo.
+
+
+
+
+Atividade Prática SIEM                                                                                             Slide 27
+SIEM   Slide 28
+     Caso Prático: Premissas do Sistema
+
+
+
+                                                                                
+
+          Volume de Eventos                  Tamanho do Payload                  Retenção Regulatória
+          O sistema ingere continuamente     O tamanho médio de cada evento de   A legislação exige retenção segura em
+          telemetria de segurança em larga   log contendo dados JSON             armazenamento frio e indexado.
+          escala.                            compactados.
+                                                                                 2 Anos
+          100 Milhões                        500 Bytes                           de retenção obrigatória
+          de requisições por dia             ~0.5 KB por payload
+
+
+
+
+Premissas de Engenharia                                                                                                  Slide 28
+Cálculo: Volume de Ingestão
+
+
+
+
+1. Ingestão Diária            2. Ingestão Anual (365 Dias)
+
+
+
+
+Cálculo de Capacidade                                        Slide 29
+Cálculo: Storage e Vazão (QPS)
+
+
+
+
+3. Storage Total em 2 Anos                                                          4. Vazão Média em Tempo Real
+
+
+
+
+Armazenamento bruto mínimo sem contar fatores de replicação e índices adicionais.   Taxa média contínua de processamento exigida pelo pipeline de ingestão.
+
+
+
+
+Cálculo de Vazão                                                                                                                                              Slide 30
+Cálculo: Banda e Rajadas
+
+
+
+
+5. Banda de Rede Média     6. Rajada de Pico (Fator de 10x)
+
+
+
+
+Dimensionamento de Rede                                       Slide 31
+Provocações para a Pós-Graduação
+
+
+
+       1. O Impacto da Rajada de 10x                                2. O Impacto do WAF nos SSDs
+      Se o tráfego saltar para 11.570 QPS por 1 hora durante um     Se a nossa árvore NoSQL LSM tiver um WAF = 3.5, quantos
+      ataque cibernético, o que ocorre se usarmos RabbitMQ          terabytes serão gravados ﬁsicamente em 2 anos?
+      (RAM) vs. Kafka (Disco)?
+
+      O broker em RAM sofrerá risco iminente de OutOfMemoryError,
+                                                                    127.75 TB gravados nas células ﬂash!
+      enquanto o broker append-only absorverá a rajada sem
+      degradação de vazão.                                          • Esse volume reduz drasticamente a vida útil de discos
+                                                                    corporativos padrão.
+
+
+
+
+Debate Crítico                                                                                                                Slide 32
+Próximos Passos: Aula 03
+
+
+
+
+   Limites Físicos do Tempo                               O Perigo do LWW                                   Google Spanner & TrueTime
+   Por que relógios físicos de quartzo sofrem desvio      Por que a estratégia Last-Write-Wins gera perda   Uso de receptores GPS e relógios atômicos em
+   (drift) e como o NTP é insuﬁciente para ordenação em   silenciosa de dados em sistemas concorrentes      datacenters para criar intervalos de incerteza
+   bancos NoSQL.                                          distribuídos.                                     delimitados $[t_{min}, t_{max}]$.
+
+
+
+
+Ponte para Aula 03                                                                                                                                           Slide 33
+Lembrete: Fichamento Individual
+
+
+
+
+             Plataforma Oﬁcial da Disciplina
+     Acessem o portal para escolher seu artigo entre os 16 selecionados e baixar o modelo estruturado de ﬁchamento:
+
+
+         https://fichamento.lovable.app
+
+     Prazo de entrega e apresentação oral: Aula 10 (22/10/2026).
+
+
+
+
+Entregáveis da Disciplina                                                                                             Slide 34
+Lembrete: Formação dos grupos
+
+
+
+
+                                                                                     
+     1. Equipe & Tema                        2. Formato & Registro                     3. Submissão & Bônus
+     • Integrantes: Cada grupo pode ser      • Extensão: Os artigos devem conter, no   • Entrega: Os artigos devem ser
+     composto por um a quatro integrantes.   mínimo, 7 páginas.                        submetidos diretamente através da
+                                                                                       plataforma.
+     • Foco Principal: Escolha de tema       • Cadastro: Registro obrigatório na
+     diretamente ligado a sistemas de uso    plataforma, informando o tema, nome e     ★ Bônus de Idioma: Artigos redigidos em
+     intensivo de dados e microsserviços.    e-mail de cada integrante do grupo.       inglês recebem bônus.
+                                                                                       ★ Bônus de Publicação: Envio para
+                                                                                       periódicos ou eventos (após validação do
+                                                                                       professor) garante pontuação extra.
+
+
+
+
+Entregáveis da Disciplina                                                                                                         Slide 34
+                       Dúvidas e Discussão
+                         Obrigado a todos pela participação na Aula 02!
+
+
+                              Prof. Dr. Fabio Gomes Rocha   PROCC — UFS
+
+
+
+
+Encerramento Aula 02                                                      Slide 35
+

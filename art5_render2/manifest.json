@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\Art_5_-_SwArchitectureTravelogue.pdf",
+  "sourceSha256": "d516a3bbd973dfd6a044e25a24b116b3423e673ffcce6cf5b891ad00ad5de867",
+  "dpi": 200,
+  "pageCount": 11,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\art5_render2\\page-0001.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 772847
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "D:\\dsh-vsky\\art5_render2\\page-0002.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 840693
+    },
+    {
+      "index": 3,
+      "page": 3,
+      "path": "D:\\dsh-vsky\\art5_render2\\page-0003.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 882480
+    },
+    {
+      "index": 4,
+      "page": 4,
+      "path": "D:\\dsh-vsky\\art5_render2\\page-0004.png",
+      "width": 1700,
+      "height": 2200,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 882732
+    }
+  ],
+  "missingFonts": []
+}

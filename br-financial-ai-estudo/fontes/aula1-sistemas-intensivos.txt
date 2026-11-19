@@ -1,0 +1,636 @@
+                                                                 Universidade Federal de Sergipe — UFS PROCC —
+                                                                    Programa de Pós-Graduação em Ciência da
+                                                                                  Computação
+
+
+
+
+Sistemas Intensivos em Dados, Microsserviços e Pesquisa
+Avançada
+Aula 01 — Apresentação, Panorama e o Jogo da Pós-Graduação
+
+
+          Prof. Dr. Fabio Gomes Rocha Docente
+          & Pesquisador Permanente (PROCC /
+          UFS)
+
+
+
+
+Tópicos Avançados em Eng. de Software e Sistemas de Informação                                                   PROCC / UFS — Slide
+                                                                                                                 1
+Prof. Fabio Gomes Rocha
+
+
+
+
+      Atuação no Mercado: Coordenador de Pesquisa & Inovação na NTT Data, com
+      foco em arquiteturas corporativas de alta escala, sistemas inteligentes e
+      comércio exterior.
+      Atuação Acadêmica: Pesquisador permanente no PROCC/UFS desde 2022,
+      orientando dissertações e pesquisas aplicadas.
+
+      Ponte de Duas Vias: Unindo o pragmatismo e problemas reais do mercado ao
+      rigor metodológico, matemático e formal da academia.
+
+
+
+
+Perﬁl Docente                                                                     Slide 2
+Agenda da Aula 01
+
+
+
+
+    Bloco 01: O "Jogo" Cientíﬁco                     Bloco 02: Fronteiras em DIS                     Bloco 03: Dinâmica da Disciplina
+    O que é ciência, pesquisa em Engenharia de       Sistemas Intensivos em Dados, Microsserviços,   Anatomia do artigo (IMRAD), Fichamento Individual
+    Software, bibliometria, impacto e as regras da   SIEM, IA/AIOps, decomposição ADD, Sagas e       (com modelo + apresentação oral) e Emulação de
+    Pós-Graduação (Frery, 2014; Volpato, 2007).      veriﬁcação formal com Redes de Petri.           Peer Review em grupo.
+
+
+
+
+Estrutura da Aula                                                                                                                                   Slide 3
+                                   O "Jogo" da Pesquisa Cientíﬁca
+                                   Compreendendo os fundamentos, o método e a mudança de chave mental da graduação/indústria
+                                                                     para a Pós-Graduação.
+
+
+
+
+Módulo I: Fundamentos da Ciência                                                                                               Slide 4
+O que é Pesquisa e Ciência?
+
+
+
+
+   Pesquisa Comum                                       Pesquisa Cientíﬁca                               Conceito de Ciência
+   Toda atividade realizada para descobrir a resposta   A pesquisa que utiliza rigorosamente o método    Forma humana de construir e aceitar
+   a uma indagação. Nem toda pesquisa é cientíﬁca       cientíﬁco e pressupostos formais, independente   generalizações universais acerca do universo via
+   (Volpato, 2007; Frery, 2014).                        do objeto sob investigação.                      método e discurso lógico (admitindo sua
+                                                                                                         precariedade).
+
+
+
+
+Fundamentos Cientíﬁcos (Volpato, 2007)                                                                                                                  Slide 5
+Natureza Internacional da Ciência
+
+
+
+
+       Discurso Sem Fronteiras                                              Universalidade e Precariedade
+    A ciência não possui barreiras regionais. Uma descoberta cientíﬁca   Generalização Universal: O objetivo da pesquisa é encontrar padrões
+    produzida no PROCC/UFS deve ser validada e compreendida pela         que se apliquem além do experimento isolado.
+    comunidade global.                                                   Aceitação da Precariedade: A ciência progride reconhecendo que toda
+    O conhecimento cientíﬁco precisa ser formulado em idioma e formato   teoria é válida até que evidências mais fortes a reﬁnem ou refutem.
+    que permitam a auditabilidade internacional por pares.
+
+
+
+
+Premissas Cientíﬁcas (Frery, 2014)                                                                                                             Slide 6
+O Ciclo Cientíﬁco Clássico
+
+
+
+
+      Percepção e Observação Controlada: Identiﬁcação de fatos na natureza/sistemas sob a ótica de um paradigma teórico bem deﬁnido.
+
+      Formulação de Hipóteses e Generalização: Proposta de explicações testáveis e extensíveis para cenários mais amplos.
+
+      Veriﬁcação, Validação e Publicação: Submissão do trabalho à crítica rigorosa da comunidade em veículos de alto nível.
+
+      Incorporação à Malha do Conhecimento: O novo conhecimento passa a servir de base para pesquisas futuras no ecossistema global.
+
+
+
+
+Fluxo do Conhecimento (Frery, 2014)                                                                                                    Slide 7
+O Produto Real da Pós-Graduação
+
+
+
+
+                                        Conhecimento Inédito + Formação de Alto Nível
+                                        • Na Indústria: O produto é um software funcional para resolver uma
+                                        necessidade imediata do negócio.
+                                        • Na Pós-Graduação: O software é apenas um veículo experimental. A saída real
+                                        é a geração de conhecimento inédito e a formação de recursos humanos
+                         O Produto do
+                                        altamente qualiﬁcados (Frery, 2014).
+                             PPG
+                                        "Pesquisa sem originalidade, sem método e sem publicação em veículos validados não é
+                                        pesquisa cientíﬁca." (Volpato, 2006)
+
+
+
+
+Mindset do Pesquisador                                                                                                  Slide 8
+Pesquisa em Eng. de Software
+
+
+
+
+        Construção vs. Ciência em ES                                        Exemplo em Microsserviços
+    Construção Comercial: Aplica frameworks e linguagens para             • Abordagem Comercial: Quebrar o sistema por intuição ou conforme
+    implementar requisitos operacionais.                                  domínios de negócio superﬁciais.
+    Pesquisa Cientíﬁca em ES: Responde ao porquê e ao como provar.        • Abordagem Cientíﬁca: Propor um método formal de decomposição
+    Projeta novos modelos, avalia trade-offs sob incerteza e estabelece   (ex: ADD) e provar empiricamente que ele reduz o acoplamento e previne
+    garantias formais.                                                    deadlocks.
+
+
+
+
+Rigor e Método em ES                                                                                                                           Slide 9
+O Conceito de Impacto Cientíﬁco
+
+
+
+
+   Impacto Comercial                                  Impacto Cientíﬁco                              Veículos de Impacto
+   Mede o valor ﬁnanceiro ou operacional gerado por   Mede a aceitação, o uso e a citação do         Meios mais internacionais, perenes, validados por
+   uma solução pontual para um cliente especíﬁco de   conhecimento pela comunidade cientíﬁca         pares e acessíveis globalmente (Frery, 2014).
+   mercado.                                           internacional através de veículos indexados.
+
+
+
+
+Bibliometria & Impacto                                                                                                                               Slide 10
+Calcanhar de Aquiles na Pesquisa
+
+
+
+
+       Deadline-Driven Research: Focar na data limite da submissão em vez da profundidade e maturidade da pesquisa (Wing, 2009; Frery, 2014).
+
+       Falta de Originalidade e Plágio: Tentar publicar variações triviais sem contribuição inédita clara ("artigo salaminho" / LPU).
+
+       Falhas Metodológicas e Amostragem: Ausência de rigor na coleta de dados, experimentos sem controle ou falta de testes de hipótese.
+
+       Introdução e Revisão Bibliográﬁca Fracas: Falhar na deﬁnição do problema ou esquecer de citar trabalhos fundamentais (que serão revisores!).
+
+
+
+
+Armadilhas Críticas (Frery, 2014)                                                                                                                     Slide 11
+                          Veículos, Bibliometria e Métricas
+                          Como navegar na literatura, avaliar a qualidade de periódicos e entender indicadores bibliométricos
+                                                                  (ISI, JCR, h-index).
+
+
+
+
+Módulo II: Bibliometria                                                                                                         Slide 12
+Conferências vs. Periódicos
+
+
+
+
+ Atributo                               Anais de Conferência                                        Periódicos Indexados (Journals)
+
+
+ Objetivo Principal                     Disseminação rápida e debate de ideias iniciais             Memória perene e certiﬁcação da ciência (Frery, 2014)
+
+
+ Processo de Revisão                    Seleção rápida, tipicamente *one-shot* (sem iterações)      Múltiplas rodadas de revisão criteriosa por pares
+
+
+ Limitação de Espaço                    Rígida (geralmente 8 a 10 páginas)                          Flexível (permite detalhamento de provas e dados)
+
+
+ Avaliação e Impacto                    Avaliados por taxa de rejeição ou h-index de conferências   Métricas consolidadas (JCR, Fator de Impacto, SJR)
+
+
+
+
+Veículos de Comunicação (Frery, 2014)                                                                                                                       Slide 13
+O que é Bibliometria?
+
+
+
+
+   Deﬁnição Formal                                    Aplicações Práticas                             Qualidade da Fonte
+   Aplicação de métodos estatísticos e matemáticos    Identiﬁcar tendências de pesquisa, medir        A qualidade percebida de uma pesquisa nunca
+   para analisar a comunicação escrita e a evolução   dispersão do conhecimento, mapear               será superior à do pior artigo citado em sua revisão
+   de uma disciplina.                                 obsolescência e avaliar autores/instituições.   (Dica de Frery, 2014).
+
+
+
+
+Métodos Bibliométricos                                                                                                                                 Slide 14
+O Ecossistema ISI / Web of Science
+
+
+
+
+      Science Citation Index Expanded: Banco de dados bibliográﬁco rigoroso
+      indexando ~10.000 periódicos de alto nível.
+
+      Critérios de Inclusão no ISI: Regularidade, padrões internacionais, rigoroso     Acesso via CAPES
+      *peer review* e diversidade geográﬁca de autores/editores.                     O Portal de Periódicos da CAPES fornece acesso integral à Web of
+
+      Mapeamento de Citações: Rastreamento das redes de citações que                 Science e JCR para alunos e pesquisadores da UFS/PROCC.
+
+      interconectam a literatura cientíﬁca global.
+
+
+
+
+Bases de Dados (Frery, 2014)                                                                                                                            Slide 15
+Métricas: Fator de Impacto
+
+
+
+
+    Fator de Impacto (FI)                            Immediacy Index                             Cited Half-Life
+    Média de citações recebidas nos últimos 2 anos   Mede a rapidez com que os artigos de um     Número de anos no passado responsáveis por
+    dividida pelo total de artigos publicados pelo   periódico são citados no mesmo ano de sua   50% do total de citações recebidas pelo
+    periódico no mesmo período.                      publicação.                                 periódico atualmente.
+
+
+
+
+Métricas de Periódicos (JCR)                                                                                                                  Slide 16
+Produtividade: O Índice h
+
+
+
+
+                                                         Equilíbrio entre Quantidade e Relevância
+
+
+
+                                            h
+                                                         • Um pesquisador possui índice h se publicou h artigos, cada um dos quais
+                                                         recebeu pelo menos h citações na comunidade.
+                                                         • Evita distorções de um único artigo muito citado ou de alta produtividade sem
+                                          Hirsch Index   impacto ("artigos salaminho").
+                                             (2005)      Ferramentas oﬁciais: ISI Web of Science, Scopus e Google Scholar (i10).
+
+
+
+
+Produtividade Individual (Hirsch, 2005)                                                                                              Slide 17
+Técnica da Revisão Bibliográﬁca
+
+
+
+
+    1. Artigos Semente                             2. Cone do Passado                                  3. Cone do Futuro
+    Escolher $n \ge 1$ artigos fundamentais de     Analisar as referências citadas por esses artigos   Veriﬁcar quais trabalhos mais recentes citaram os
+    altíssima qualidade como base inicial do seu   para entender as origens e fundamentos do tema.     artigos semente para mapear o estado da arte e
+    trabalho.                                                                                          iterar.
+
+
+
+
+Metodologia de Revisão (Frery, 2014)                                                                                                                    Slide 18
+       Sistemas Intensivos em Dados e Microsserviços
+                                  Panorama arquitetural: a grande interseção tecnológica entre DIS, Microsserviços, Inteligência
+                                                                   Artiﬁcial e Cibersegurança.
+
+
+
+
+Módulo III: Arquitetura Técnica                                                                                                    Slide 19
+A Grande Interseção
+
+
+
+
+Nesta disciplina, analisamos a convergência crucial de quatro
+eixos da computação moderna: Sistemas Intensivos em
+Dados (DIS), Microsserviços, Inteligência Artiﬁcial e
+Cibersegurança.
+
+
+Estudo de Caso — SIEM: Ingestão e correlação de terabytes
+de logs/segundo via coletores distribuídos, análise preditiva
+em tempo real (AIOps) e proteção de infraestruturas críticas.
+
+
+
+Aprenderemos a projetar arquiteturas elásticas com
+persistência poliglota e alta resiliência.
+Desaﬁos em Sistemas DIS
+
+
+
+
+   Conﬁabilidade (Reliability)                   Escalabilidade (Scalability)                     Manutenibilidade
+   Resiliência do sistema diante de falhas de    Capacidade de responder adequadamente ao         Simplicidade de arquitetura, operabilidade por
+   hardware, inconsistências de rede e erros     aumento de volume de dados, vazão (throughput)   equipes de DevOps e facilidade de evolução
+   humanos. Tolerância a falhas sem degradação   e complexidade de consultas.                     contínua do software.
+   total.
+
+
+
+
+Pilares de Kleppmann em DIS                                                                                                                        Slide 21
+Conﬁabilidade e Falhas
+
+
+
+
+       Falhas vs. Erros vs. Desastres                                       Estratégias em DIS
+    Falha (*Fault*): Desvio de um componente individual do seu            • Redundância de nós de computação e dados via replicação
+    comportamento especiﬁcado.                                            (*Leader-Follower* / *Quorum*).
+    Erro (*Failure*): Quando o sistema como um todo deixa de fornecer o   • Isolamento de falhas através do padrão *Circuit Breaker* e tratamento
+    serviço correto aos usuários.                                         de partições de rede (*Partition Tolerance*).
+
+
+
+
+Resiliência em Escala                                                                                                                           Slide 22
+Escalabilidade e Carga
+
+
+
+
+      Parâmetros de Carga: Deﬁnir numericamente o que signiﬁca "carga" no
+      sistema (RPS, razões leitura/escrita, tamanho de mensagens, acessos
+                                                                                 Particionamento (Sharding)
+      simultâneos).
+      Métricas de Desempenho: Analisar latência no percentil 99 ($P_{99}$) e
+                                                                               Divisão de grandes conjuntos de dados em partições independentes
+      $P_{99.9}$, em vez de médias ilusórias.
+                                                                               baseadas em chaves de hash ou intervalos, evitando *hotspots* de
+      Escalonamento Vertical vs. Horizontal: Transição do *scale-up* para
+                                                                               processamento.
+      arquiteturas distribuídas *shared-nothing* (*scale-out*).
+
+
+
+
+Engenharia de Escalabilidade                                                                                                                      Slide 23
+Microsserviços em Foco
+
+
+
+
+      Decomposição Objetiva: Como transitar de monólitos legados para microsserviços sem criar monólitos distribuídos ineﬁcientes?
+
+      Persistência Poliglota: Escolher o modelo de banco ideal (Relacional, Documentos, Chave-Valor, Grafos) para a necessidade de cada serviço.
+
+      Desaﬁos Transacionais: Abandonar transações ACID distribuídas de duas fases (2PC) e adotar modelos de consistência eventual.
+
+      Observabilidade Distribuída: Rastreamento ponta a ponta (*Distributed Tracing*) em malhas complexas de microsserviços.
+
+
+
+
+Pesquisa em Microsserviços                                                                                                                         Slide 24
+Decomposição Formal (ADD)
+
+
+
+
+        Actor-Driven Decomposition                                          Avaliação Cientíﬁca
+    Método formal para decompor sistemas identiﬁcando atores do domínio   • Permite medir o acoplamento estrutural e a coesão semântica das
+    e seus contextos delimitados (*Bounded Contexts*).                    fronteiras propostas.
+    Agrupa responsabilidades por coerência funcional e isolamento de      • Fornece métricas reproduzíveis para comparar alternativas de
+    estado, minimizando chamadas síncronas entre serviços.                decomposição antes da implementação.
+
+
+
+
+Engenharia de Arquitetura                                                                                                                     Slide 25
+Consistência e Padrão Saga
+
+
+
+
+    Sequência de Transações                            Ações Compensatórias                            Coreograﬁa vs. Orquestração
+    Uma Saga é uma sequência de transações locais      Se uma etapa falha, a Saga executa transações   Troca descentralizada de eventos (*Coreograﬁa*)
+    em múltiplos serviços. Cada serviço atualiza seu   compensatórias em ordem reversa para desfazer   vs. um coordenador central de ﬂuxo
+    banco e publica um evento.                         alterações anteriores.                          (*Orquestração*).
+
+
+
+
+Padrões Distribuídos                                                                                                                                Slide 26
+Observabilidade com OCEL 2.0
+
+
+
+
+      Object-Centric Event Logs: Padrão avançado de logs focado em múltiplos
+      objetos simultâneos e suas interações no tempo.
+
+      Mineração de Processos (Process Mining): Reconstrução e auditoria           MSR + Observabilidade
+      automática dos ﬂuxos reais de execução em sistemas distribuídos.          Integração de logs de eventos operacionais com histórico de repositórios
+
+      Detecção de Anomalias: Identiﬁcação de desvios operacionais, gargalos e   para prever e isolar falhas arquiteturais complexas.
+
+      falhas de conformidade em tempo real.
+
+
+
+
+Mineração e Observabilidade                                                                                                                          Slide 27
+Veriﬁcação via Redes de Petri
+
+
+
+
+       Modelagem Matemática                                                  Garantias Rigorosas
+   Ferramenta formal gráﬁca e matemática composta por Lugares,             • Prova matemática da ausência de *Deadlocks*, *Livelocks* e condições
+   Transições e Marcas (*Tokens*).                                         de corrida (*Race Conditions*).
+   Permite simular o comportamento de sistemas concorrentes, assíncronos   • Validação formal de protocolos de comunicação e ﬂuxos de Sagas
+   e distribuídos.                                                         complexas.
+
+
+
+
+Métodos Formais em ES                                                                                                                         Slide 28
+                                   Metodologia e Escrita Cientíﬁca
+                                    Métodos de pesquisa empírica em Engenharia de Software, estrutura de artigos (IMRAD) e
+                                                              blindagem de ameaças à validade.
+
+
+
+
+Módulo IV: Metodologia e Redação                                                                                             Slide 29
+Métodos de Pesquisa em ES
+
+
+
+
+ Método Cientíﬁco                  Foco Principal                   Aplicação em DIS / Microsserviços                                    Tipo de Evidência
+
+
+ Engenharia Empírica               Experimentos Controlados         Medição de latência e vazão entre mensagerias (Kafka vs Pulsar)      Benchmarks & Testes de Hipótese
+
+
+ Mineração de Repositórios (MSR)   Análise de Artefatos de Código   Identiﬁcação de anti-padrões arquiteturais em repositórios abertos   Métricas de Código & Histórico Git
+
+
+ Estudo de Caso Industrial         Contexto de Mundo Real           Análise da migração monólito-microsserviço na NTT Data               Qualitativa / Mista e Lições Aprendidas
+
+
+ Métodos Formais                   Prova e Veriﬁcação Lógica        Detecção de deadlocks em Sagas utilizando Redes de Petri             Provas Matemáticas de Correção
+
+
+
+
+Taxonomia Metodológica                                                                                                                                                     Slide 30
+Engenharia Empírica (ESE)
+
+
+
+
+   Experimentos Controlados                          Testes de Hipótese                                   Reprodutibilidade (RR)
+   Isolamento de variáveis independentes para        Uso de testes estatísticos rigorosos ($t$-Student,   Disponibilização de pacotes de replicação
+   observar seu impacto direto em métricas           Mann-Whitney, ANOVA) para rejeitar a hipótese        (*Replication Packages*) com dados e scripts
+   dependentes (desempenho, legibilidade, falhas).   nula ($H_0$).                                        abertos (Frery, 2014).
+
+
+
+
+Empirismo em ES                                                                                                                                          Slide 31
+Mineração de Repositórios (MSR)
+
+
+
+
+      Análise de Artefatos Históricos: Mineração de commits, *pull requests*,
+      discussões e relatórios de erro (*bug reports*).
+
+      Extração de Métricas de Código: Complexidade Ciclomática, Acoplamento,      Grandes Repositórios
+      Churn de Código e degradação arquitetural ao longo do tempo.              Uso de bases consolidadas como GitHub, GitLab e Bitbucket em escala
+
+      Modelagem Preditiva: Treinamento de modelos de IA para prever quais       para validar teorias de Engenharia de Software.
+
+      módulos têm maior probabilidade de falhar no futuro.
+
+
+
+
+MSR & Analytics                                                                                                                                   Slide 32
+Anatomia do Artigo (IMRAD)
+
+
+
+
+             1. Introdução (Hook & Gap)
+                                                                   2. Metodologia (IMRAD)                        3. Resultados & Discussão
+
+
+
+    Apresentação do problema, o **Hook** (por que         Descrição transparente e reprodutível dos      Apresentação rigorosa dos dados
+    importa?) e o **Gap** (o que a literatura atual não   procedimentos, algoritmos, ambientes e dados   empíricos/formais e sua interpretação à luz do
+    resolveu).                                            utilizados.                                    estado da arte.
+
+
+
+
+Padrão IEEE / ACM (Pasteur / Day, 1998)                                                                                                                   Slide 33
+Threats to Validity
+
+
+
+
+   Construct Validity                            Internal Validity                                   External Validity
+   Se as métricas escolhidas realmente medem o   Garantia de que os resultados foram causados        Capacidade de generalização dos achados para
+   conceito teórico que se pretende avaliar.     pelo tratamento experimental e não por fatores de   outros domínios, linguagens e cenários industriais.
+                                                 confusão.
+
+
+
+
+Blindagem Cientíﬁca                                                                                                                                  Slide 34
+                      Dinâmica da Disciplina e Avaliação
+                       Como funcionará o semestre: Fichamentos Individuais, Redação de Artigo em Grupo e o Processo
+                                                         de Peer Review às cegas.
+
+
+
+
+Módulo V: Avaliação                                                                                                   Slide 35
+Sistema de Avaliação
+
+
+
+
+   Fichamento Individual (10%)                           Artigo em Grupo (60%)                              Peer Review (30%)
+   Leitura crítica de artigo de alto impacto em DIS/ES   Redação cientíﬁca no padrão IEEE/ACM sobre os      Emulação de conferência internacional. Revisão às
+   (disponibilizado pelo professor). Preenchimento       temas da disciplina (incentivado a conexão com a   cegas de 2 artigos de colegas com parecer
+   do modelo oﬁcial.                                     proposta de dissertação no PROCC).                 técnico detalhado.
+
+
+
+
+              Link para escolha e submissão do fichamento: https://fichamento.lovable.app
+
+
+
+
+Componentes de Avaliação                                                                                                                                  Slide 36
+O Fichamento Individual
+
+
+
+
+      Artigo Disponibilizado: O professor atribuirá um artigo cientíﬁco de alto impacto (periódicos ISI/Scopus ou conferências A1/A2) a cada aluno.
+
+      Preenchimento do Modelo Oﬁcial: Download e preenchimento do template de ﬁchamento estruturado (Hook, Gap, Método, Resultados e Crítica).
+
+      Apresentação Oral em Sala: Exposição síntese de 10−15 minutos do artigo para a turma, defendendo a contribuição e apontando limitações.
+
+
+
+
+                                                    https://fichamento.lovable.app/
+
+
+
+
+Fichamento e Seminários                                                                                                                               Slide 37
+Artigo e Peer Review
+
+
+
+
+       Artigo Cientíﬁco em Grupo (60%)                                          Emulação de Peer Review (30%)
+    • Trabalho em equipes de 2 a 3 alunos no formato oﬁcial IEEE/ACM (6 a 8   • Submissão cega do artigo preliminar do grupo.
+    páginas).                                                                 • Cada estudante atuará como revisor de 2 artigos anônimos, emitindo
+    • Foco: Desenvolvimento de uma contribuição inédita (pesquisa empírica,   notas, parecer técnico justiﬁcando a decisão (*Accept*, *Minor*, *Major*,
+    revisão sistemática rigorosa ou proposta de modelo/módulo técnico).       *Reject*) e sugestões.
+
+
+
+
+Emulação de Conferência                                                                                                                              Slide 38
+Cronograma do Semestre
+
+
+
+
+                                            Etapa 02                                                                      Etapa 04
+                                            Apresentações orais dos Fichamentos e                                         Processo de Peer Review, revisão ﬁnal do
+                                            aulas teóricas avançadas em DIS/ES.                                           artigo e apresentação dos resultados.
+
+
+
+
+  Etapa 01                                                                          Etapa 03
+  Distribuição dos artigos e envio do                                               Submissão da versão preliminar do
+  modelo oﬁcial de Fichamento Individual.                                           Artigo em Grupo (formato IEEE/ACM).
+
+
+
+
+Jornada Semestral                                                                                                                                           Slide 39
+                                     Dúvidas e Debate
+   Sejam muito bem-vindos ao PROCC/UFS! Vamos iniciar a atribuição dos artigos e a disponibilização do modelo de ﬁchamento.
+
+
+                                              Prof. Dr. Fabio Gomes Rocha   PROCC —
+                                                                              UFS
+
+
+
+
+Encerramento Aula 01                                                                                                    Slide 40
+

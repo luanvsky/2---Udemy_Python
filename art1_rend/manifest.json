@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\1 - PROCC\\1-Disciplinas\\Semestre-2\\ENGENHARIA DE SOFTWARE\\Art_1_-_BoehmviewSoftwareEngineering.pdf",
+  "sourceSha256": "8f346be7d8a40602efbd944ed20f77668407f879f14302f516cf8a93b8abd6da",
+  "dpi": 144,
+  "pageCount": 18,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\dsh-vsky\\art1_rend\\page-0001.png",
+      "width": 1224,
+      "height": 1584,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 816,
+        "height": 1056
+      },
+      "byteLength": 439652
+    }
+  ],
+  "missingFonts": []
+}

@@ -1,0 +1,4 @@
+﻿configuracao;modo_busca;metrica_score;baterias;tempo_medio_carga1_ms;desvio_carga1_ms;tempo_medio_carga2_ms;desvio_carga2_ms;pico_memoria_media_mb;chunks_corpus;k
+Configuracao 1 (Busca Linear);linear;simples;4;41,4582;0,2173;23,1264;1,1819;0,1340;182;5
+Configuracao 2 (Busca Indexada);indexada;bm25;4;3,6487;0,6282;2,5715;0,2877;0,1301;182;5
+Configuracao 3 (Indexada + Merge Sort Top-k);indexada;bm25;4;2,6997;0,1031;3,3655;0,2207;0,1317;182;5

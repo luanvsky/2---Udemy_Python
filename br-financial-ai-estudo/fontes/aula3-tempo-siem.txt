@@ -1,0 +1,891 @@
+                SISTEMAS DE USO INTENSIVO DE DADOS • AULA 03
+
+
+
+
+   A Física do Tempo e
+Sincronização Distribuída
+ Clock drift, NTP, clocks monotônicos, LWW, TrueTime e SIEM/Telemetria
+
+
+
+
+   Programa de Pós-Graduação em Ciência da Computação • Mestrado/Doutorado
+
+                         Prof. Fabio Gomes Rocha
+                                         Aula: do oscilador ao SOC
+
+   01       Compreender a limitação física dos relógios em máquinas distribuídas.
+
+
+
+
+   02       Diferenciar relógio de parede, relógio monotônico e relógios lógicos.
+
+
+
+
+   03       Analisar perda silenciosa de dados por Last-Write-Wins.
+
+
+
+
+            Conectar teoria com prática de SIEM, telemetria e investigação
+   04       forense.
+
+
+
+
+            Abrir trilhas de pesquisa: incerteza temporal, correlação causal e
+   05       stream processing.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM           EMENTA • Slide 02
+Mapa narrativo da aula                                                                                                            VISÃO GERAL
+
+
+
+
+                      Física                                     APIs de tempo       Consistência   Alternativas      SIEM
+
+
+
+
+                      quartzo                                           wall clock       LWW          TrueTime          SOC
+                       drift                                            monotonic       NoSQL          Lamport          logs
+                       PPM                                                NTP         causalidade    Vector clocks   watermarks
+
+
+
+
+                     Mensagem central: em sistemas intensivos de dados, tempo não é metadado; é parte da
+                                      semântica de ordenação, consistência e evidência.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                       03
+O desaﬁo fundamental da computação distribuída                                                                                        ABERTURA
+
+
+
+
+                                                                                A pergunta parece operacional, mas envolve três
+                                                                                dimensões:
+
+               “                                                                      Física             Lógica             Forense
+               Se dois servidores em salas diferentes
+               registrarem um log exatamente no
+               mesmo milissegundo, como provamos
+               qual evento aconteceu primeiro?                                     PONTO PARA PESQUISA
+
+                                                                                   ordenar eventos sem pressupor tempo
+                                                                            ”      absoluto
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                        04
+Hardware: o oscilador de cristal de quartzo                                                  BLOCO 1
+
+
+
+
+              ⚙ Efeito piezoelétrico
+              Corrente elétrica gera oscilações mecânicas em frequência estável, usadas
+              como “batidas” do relógio local.
+
+
+
+
+              ⏱ Frequência padrão
+              32.768 Hz (= 2¹⁵) facilita contagem binária de segundos em hardware de baixo
+              custo.
+
+
+
+
+              ⚠ Limitação física
+              Pequenas diferenças de fabricação impedem que dois cristais vibrem
+              exatamente na mesma taxa.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                              05
+Fatores físicos do clock drift                                                                                                                                                           BLOCO 1
+
+
+
+
+          🌡         Variação térmica                                        ⌛      Envelhecimento                                  ⚡      Ruído elétrico
+
+
+          A carga computacional altera a temperatura do rack e              A degradação estrutural do quartzo ao longo dos anos   Flutuações de voltagem e interferência na placa-mãe
+          muda sutilmente a rigidez do cristal.                             modifica sua ressonância natural.                      geram microdesvios de contagem.
+
+
+
+
+                      Consequência: cada nó “vive” o tempo em uma velocidade ligeiramente
+                                                   diferente.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                                          06
+A métrica padrão: Parts Per Million (PPM)                                                                                                  BLOCO 1
+
+
+
+
+                                                                              PPM mede quantos microssegundos por segundo o relógio pode
+                                  200                                         ganhar ou perder.
+
+                      PPM típico em hardware commodity
+                                                                              200 PPM significa erro de 200 μs por segundo.
+
+                                                                              A incerteza cresce linearmente entre sincronizações.
+
+
+
+
+                                                                            Δt = T × (PPM / 1.000.000)
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                            07
+Exercício numérico: frequência de sincronização                                                                                                                  BLOCO 1
+
+
+
+
+                        Sincronização frequente                                          Sincronização horária                                 ⚠ Falha de rede
+
+
+             Intervalo: 30 s                                                     Intervalo: 1 h                                    Intervalo: 24 h
+             Taxa: 200 PPM                                                       Taxa: 200 PPM                                     Taxa: 200 PPM
+
+
+             Desvio Máximo                                                       Desvio Máximo                                     Desvio Máximo
+
+
+             6 ms                                                                720 ms                                            17,28 s
+
+
+                                                                                         A conclusão que incomoda
+
+                               Uma falha de sincronização aparentemente curta pode deslocar a cronologia operacional por segundos.
+
+
+
+                                                                            ✏ ATIVIDADE EM SALA: recalcular com 50 PPM e 500 PPM
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                  08
+Network Time Protocol (NTP) e hierarquia Stratum                                                                                                BLOCO 1
+
+
+
+
+                             Stratum 0
+                  0
+                             GPS / relógio atômico (Fonte de referência primária)
+
+
+
+
+                             Stratum 1
+                  1
+                             servidor ligado diretamente à referência de tempo
+
+
+
+
+                             Stratum 2+
+                 2+
+                             servidores secundários sincronizados via rede
+
+
+
+
+                                                                                    A dinâmica de sincronização
+                      O NTP aproxima o UTC por troca de mensagens UDP, mas precisa inferir o atraso da rede — e a rede raramente é simétrica.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                 09
+Limitações físicas e incerteza do NTP                                                                                                                                  BLOCO 1
+
+
+
+
+                 RTT Variável
+                  A ida e a volta da mensagem de sincronização podem seguir caminhos                                       Ida: d₁
+                  físicos totalmente diferentes na rede.
+                                                                                              cliente                                                   servidor NTP
+
+
+                 Jitter (Variação de Atraso)
+                  Filas dinâmicas nos buffers dos roteadores introduzem ruído estatístico
+                                                                                                                         Volta: d₂
+
+                  na estimativa fina de offset temporal.                                                  Caminhos e latências assimétricas (d₁ ≠ d₂)
+
+
+
+
+                 Distância Geográfica
+                  A comunicação multirregião em nuvem impõe dezenas ou centenas de           O algoritmo clássico do NTP assume simetria na rede de
+                                                                                                 Premissa Arriscada: d₁ ≈ d₂
+
+                  milissegundos de incerteza física inevitável.                                  computadores. Na internet real, a variação de rotas torna essa
+                                                                                                 estimativa imprecisa e arriscada para consistência estrita.
+
+
+                 Vulnerabilidades de Segurança
+                  Ataques de spoofing e amplificação de NTP podem desestabilizar
+                  maliciosamente a base temporal dos servidores.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                        10
+Time-of-Day vs. Monotonic Clocks                                            BLOCO 2
+
+
+
+
+        Introdução ao Bloco 2
+
+        Time-of-Day vs.
+        Monotonic Clocks
+        A arquitetura das APIs de contagem de tempo no SO e os riscos em
+        medições de desempenho.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM             11
+Relógios de parede (CLOCK_REALTIME)                                                                                                       BLOCO 2
+
+
+
+
+        🕒Definição
+        Mede tempo desde a Época UNIX.
+                                                                                           latência = t_final - t_início
+        Java: System.currentTimeMillis()
+        C: clock_gettime(CLOCK_REALTIME)
+                                                                                                    t_início (Pedido)
+
+                                                                                                      10:00:00
+                                                                                                          ➔
+                                                                                                 t_final (NTP ajustou ↩)
+
+                                                                                                      09:59:58
+        ⚠Risco do Salto Temporal
+        Foi feito para humanos e auditoria. Quando o NTP corrige o relógio,   ❌ Latência de -2 segundos! O resultado pode ser negativo.
+        ele pode saltar para trás ou para frente, quebrando a consistência
+        de medições.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                           12
+Relógios monotônicos (CLOCK_MONOTONIC)                                                                                                    BLOCO 2
+
+
+
+
+               ↗ Definição
+                                                                                             Progressão Linear de Tempo
+               Retorna tempo decorrido desde um ponto arbitrário do
+               passado, geralmente o boot da CPU.
+
+                                                                                 120534 ns            120535 ns           120536 ns
+
+
+
+
+               ✓ Garantia
+                                                                                               ➔ Sempre avança
+               O valor retornado nunca salta para trás.
+                                                                              Garantia de incremento estrito, mesmo quando o relógio de
+               É a API correta para medição de duração, timeout, frequência           parede do sistema é corrigido ou ajustado.
+               e latência.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                           13
+Ajuste de tempo: slewing vs. stepping                                                                                                                              BLOCO 2
+
+
+
+
+               📈Slewing                                                                            ⚡Stepping
+               Altera suavemente a frequência dos tiques até reduzir                               Salto discreto e imediato no tempo do sistema.
+               o offset.
+                                                                                                   Simples para sincronizar o horário civil de forma rápida, mas
+               Ajuste gradual e contínuo. Excelente para manter a                                  extremamente perigoso para lógicas baseadas em duração.
+               monotonicidade sem quebras abruptas.
+                                                                                                   ⚠ Usado em CLOCK_REALTIME
+               ✓ Recomendado para CLOCK_MONOTONIC                                                  ❌ Pode causar retrocessos e quebrar timeouts
+               ✓ Evita loops negativos de latência
+
+
+
+
+               Comparação Visual de Ajuste
+               Slewing: rampa suave e contínua de convergência de tempo. ───➔ | Stepping: salto instantâneo (descontinuidade). ─── | ───➔
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                    14
+Caso real: leap seconds (2012)                                                                         BLOCO 2
+
+
+
+
+                         Segundo 61
+                        UTC adiciona 1 segundo para alinhar o tempo atômico com a rotação da Terra.
+
+
+
+
+                         O Impacto
+
+                        Sistemas Java/Linux sofreram com loops infinitos e CPUs travadas em 100%
+                         globalmente.
+
+
+
+
+                         A Lição
+
+                        Conflitos críticos podem ocorrer quando o “tempo civil” diverge do “tempo
+                         computacional”.
+
+
+
+                       Discussão em Grupo
+               Por que bancos de dados e filas de mensageria não deveriam depender de
+                       segundos civis?
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM
+Caso real: virtualização e pausas de VM                                                                                                                           BLOCO 2
+
+
+
+
+                                                                                                               
+            Hardware virtualizado                                           Pausas do hipervisor                 Efeito colateral
+            Em nuvem, relógios de hardware são                              Migração, contenção de CPU e noisy   Ao despausar, o relógio salta; heartbeats
+            emulados pelo hipervisor para o Guest OS.                       neighbors podem congelar a VM por    podem virar falsos alarmes em clusters. [cite:
+            [cite: 16]                                                      milissegundos. [cite: 16]            16]
+
+
+
+
+                                                                                              
+                                                                                      Impacto Amplificado
+
+                 Esse mesmo fenômeno afeta logs de EDR, Kubernetes audit, CloudTrail e agentes de SIEM.
+                                                      [cite: 16]
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                   16
+O timestamp como dado perigoso                                                                                                                TRANSIÇÃO
+
+
+
+
+          
+                                                                               DO TEMPO À CONSISTÊNCIA
+
+
+
+
+                                                                            O que isso significa na prática?
+                                                                            Em sistemas distribuídos, confiar no tempo físico para
+                                                                            ordenar eventos ou decidir "quem vence" é assumir um
+         Quando timestamps deixam de ser                                    risco crítico.
+
+         metadados e passam a resolver                                      Se o relógio de um servidor estiver milissegundos atrasado,
+                                                                            uma atualização legítima de um usuário pode ser
+
+         conﬂitos, eles viram parte da regra                                descartada silenciosamente.
+                                                                            A consistência lógica deve ser garantida por design, e não pela
+         de negócio.                                                        coincidência de relógios sincronizados.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                 17
+A anomalia Last-Write-Wins (LWW)                                                                                                                      BLOCO 3
+
+
+
+
+                                                       A Anomalia Last-Write-Wins (LWW)
+                                                       Perda silenciosa em bancos NoSQL leaderless ou multimestre devido a desalinhamento temporal.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                       18
+O modelo NoSQL leaderless e LWW                                             BLOCO 3
+
+
+
+
+       • Cassandra/Dynamo: múltiplos nós aceitam escritas
+       concorrentes.
+
+       • Cada operação recebe timestamp físico no cliente ou no nó.
+
+       • Em conflito, “maior timestamp vence”; o outro valor é
+       descartado.
+
+       • Premissa perigosa: relógios de parede estariam
+       sincronizados.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM             19
+Rastreando o bug LWW: cenário concorrente                                                                                                       BLOCO 3
+
+
+
+
+                                                                            PASSO 2: LEITURA & CONFLITO
+     PASSO 1: ESCRITA ORIGINAL                                                                            PASSO 3: RESOLUÇÃO LWW
+     1. Cliente A                                                           2. Cliente B
+                                                                                                          3. Node 2
+     Ação: escreve x = 1                                                    Ação: lê x=1 e grava x=2
+                                                                                                          • Recebe ambas as escritas
+     Timestamp: Node1 = 42.004s                                             Timestamp: Node3 = 42.003s
+                                                                            (atrasado!)                   • Escolhe o maior ts (42.004s >
+                                                                                                          42.003s)
+                                                                                                          Falha Silenciosa
+                                                                                                          Resultado incorreto: x = 1 sobrevive; x =
+                                                                                                          2 desaparece.
+
+   PROCESSO EM NODE 3                                                       PROCESSO EM NODE 1
+   Node 3 (clock -3ms)                                                      Node 1 (clock correto)
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                 20
+Análise de danos: perda silenciosa do dado                                                                                                    BLOCO 3
+
+
+
+
+                                                                             Tempo  Real
+                                                                              No tempo real, x=2 ocorreu depois de x=1.
+
+
+
+
+                                                                            Inversão de Causalidade
+                                                                              Com 3 ms de drift, a causalidade lógica foi invertida.
+
+
+
+
+                             x=1                                             Ausência   de Alerta (Falha Silenciosa)
+                                                                              A operação desaparece sem exceção, alarme ou retry.
+                           Valor Final Armazenado
+                                  (Estado Incorreto)
+
+
+                                                                             Perda de Evidência
+                                                                              Em domínios regulados ou forenses, isso é perda de evidência.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                               21
+Discussão de arquitetura: imutabilidade vs. LWW                                                                                                                  BLOCO 3
+
+
+
+
+              ?        Pergunta acadêmica                                            ✓     Resposta técnica
+
+
+              Se usarmos Cassandra com LWW e cadastros usando UUIDs imutáveis como   Não para inserções imutáveis: sem sobrescrita concorrente na mesma chave,
+              chave, ainda há perda por desvio de quartzo?                           LWW não escolhe um valor “vencedor”.
+
+
+
+
+                                     Mas atualizações parciais, deduplicação agressiva e upserts reintroduzem o
+                                                                     problema.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                  22
+Soluções avançadas de sincronização                                                                                                                   BLOCO 4
+
+
+
+
+                                                  Soluções Avançadas de Sincronização
+                                                                      TrueTime do Google Spanner e relógios lógicos como alternativas de ordenação.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                       23
+TrueTime API: tempo como intervalo de incerteza                                                                                                BLOCO 4
+
+
+
+
+             API TrueTime
+                                                                                                   ⚡Arquitetura de Sincronização GPS & Césio
+             now() [earliest, latest]
+
+
+
+      01
+      Exposição da Incerteza
+      O Spanner não retorna um escalar ilusório; ele expõe explicitamente a incerteza do relógio
+      de forma mensurável.
+      02
+      Tempo Real Garantido
+      O tempo real absoluto do evento está estritamente contido dentro do intervalo de tempo
+      retornado.
+      03
+      Consistência Externa
+      A ordem global e a consistência forte passam a ser garantidas sobre uma janela
+      estritamente delimitada.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                24
+Infraestrutura hardware do TrueTime                                                                                                                                  BLOCO 4
+
+
+
+
+              GPS                                                          Césio                                       εε Controlado
+              Antenas instaladas diretamente nos                            Relógios atômicos locais que mantêm uma      Garantia de incerteza máxima global
+              datacenters recebem sinais de tempo                           referência estável e independente de tempo   estritamente limitada e mantida na escala
+              altamente precisos transmitidos via satélite.                 na eventualidade de falha do sinal GPS.      de poucos milissegundos.
+
+
+
+
+                  A Pergunta Prática
+
+                  O que empresas comuns podem aprender e aplicar sem ter acesso à
+                  infraestrutura de hardware proprietária do Google?
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                      25
+Commit-wait: esperar a incerteza passar                                                                     BLOCO 4
+
+
+
+
+                                   Transação A                              WAIT 2ε         Transação B
+                                      [ t₁, t₂ ]                            ~14 ms             [ t₃, t₄ ]
+
+
+
+
+                                         A espera evita sobreposição de janelas e permite ordenar commits
+                                                                   globalmente.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                             26
+Relógios lógicos: abstraindo a física                                                                                                                                    BLOCO 4
+
+
+
+
+              L        Lamport                                                                  V      Vector clocks
+
+
+              Substitui segundos por contadores. Se A → B, então timestamp(A) < timestamp(B).   Permitem detectar concorrência: A antes de B, B antes de A, ou eventos
+                                                                                                incomparáveis.
+
+
+
+
+                       • Úteis quando a causalidade importa mais que o horário civil.
+
+                       • Podem ser combinados com timestamps físicos para auditoria e UX.
+
+                       • Abrirão a próxima aula: modelagem e implementação.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                          27
+Da teoria ao mercado: SIEM e telemetria                                                                                                                   BLOCO 5
+
+
+
+
+                                                                                                        BLOCO 5 • SIEM
+
+
+
+
+                                                         Estudo de Caso: SIEM & Telemetria
+                                                                    Quando a física do tempo vira falso negativo, perda forense e corrupção de janelas.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                           28
+Por que o tempo é crítico em SIEM?                                                                                             SIEM
+
+
+
+
+         • Um SOC reconstrói cadeia de ataque correlacionando
+         Firewall, EDR, IAM, Kubernetes Audit e CloudTrail.
+
+         • A premissa frágil: @timestamp emitido na borda
+         representaria uma linha temporal universal.
+
+         • Drift, VM pause e manipulação anti-forense podem inverter
+         causa e efeito.
+
+
+
+
+                                       MERCADO: falso negativo em regra de correlação pode custar mais que indisponibilidade
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                             29
+Fragmentação do tempo em pipelines de telemetria                                                                                           SIEM
+
+
+
+
+                       Timestamp                                            Onde nasce                                             Risco
+
+
+
+
+       event time                                        agente/endpoint                 drift, VM pause, manipulação
+
+
+
+
+       ingestion time                                    Kafka/Logstash                  mascara fila, buffer offline e retransmissão
+
+
+
+
+       processing time                                   OpenSearch/Flink                backpressure, locks, contenção de CPU
+
+
+
+
+                          Boa engenharia guarda os três — e explicita qual deles a regra de detecção usa.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                         30
+Anomalia 1: inversão causal e evasão de detecção                                                                                SIEM
+
+
+
+
+      • Atacante faz força bruta no IAM/DC e exfiltra credenciais                        Tempo real: Δ = 0,5s
+      via HTTP.
+
+      • DC é VM sob noisy neighbor: clock atrasado 4s.
+
+      • Firewall é appliance dedicado e sincronizado.
+                                                                                  E1                                E2
+                                                                            AUTH_SUCCESS                        HTTP_POST
+      • Regra: alertar se conexão externa ocorrer até 2s após                  T=10.000                          T=10.500
+      logon bem-sucedido.
+
+
+
+
+                                                                            SIEM: Δ registrado = 4,5s → regra falha
+
+                                                                                 E1                                     E2
+                                                                               06.000s                                10.500s
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                              31
+Diagrama: inversão causal no pipeline SIEM                                                                                            SIEM
+
+
+
+
+                     DC/IAM
+                    clock -4s
+                    E1=06.000
+
+
+
+                                                                             Kafka topics                                 SOC
+                                                                            auth + network      CEP / Rule Engine
+                                                                                                                       sem alerta
+                                                                                             ordena por @timestamp
+                                                                                                                     falso negativo
+
+
+
+                     Firewall
+                    clock OK
+                    E2=10.500
+
+
+
+
+                        Fato: E1 causou E2. Perspectiva reconstruída: E1 parece 4,5s antes — fora da janela de 2s.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                    32
+Anomalia 2: perda forense via LWW na deduplicação                                                             SIEM
+
+
+
+
+       • Agentes enviam logs at-least-once; buffer deduplica por ID
+       determinístico.
+                                                                                   evento benigno
+       • _id = SHA256(host + pid + comando) parece seguro, mas cria                 12:00:00.005
+       colisão intencional por evento lógico.
+
+       • Se o indexador aplica LWW, evento com timestamp menor pode ser
+       descartado.
+                                                                                   evento malicioso
+       • Rootkit injeta thread às 12:00:00.010, mas coletor com -20ms                11:59:59.990
+
+       carimba 11:59:59.990.
+
+
+
+
+                                                                            LWW escolhe o maior timestamp e
+                                                                               apaga o rastro malicioso.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                            33
+Anomalia 3: watermarks e janelas deslizantes                                                                                    SIEM
+
+
+
+
+       • Flink/Kafka Streams usam watermarks para decidir
+       quando uma janela está completa.
+                                                                                                 janela 60s
+
+       • Nós com clock adiantado injetam eventos “do futuro”.
+
+       • A watermark avança prematuramente.
+                                                                                                                evento futuro
+       • Logs corretos passam a chegar “atrasados” e podem ir                                                    clock +20s
+
+       para DLQ.
+
+       • Regras de brute force/DDoS perdem parte da evidência
+       temporal.
+                                                                                   log correto
+                                                                                     late data
+
+
+
+
+                                                                            Pergunta: a tolerância da watermark deveria ser
+                                                                               fixa, estatística ou adaptativa por fonte?
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                              34
+Padrões de mitigação para engenharia de dados intensivos                                                                                                                                                  SIEM
+
+
+
+
+        1         Dual timestamping                                         2      Tolerância bounded                        3      PTP / hardware timestamp              4     IDs lógicos
+
+
+        Persistir event.created, event.ingested e                           Calibrar atraso de watermarks com p99/p999       Carimbar no NIC ou appliance quando          Usar sequence IDs, Lamport ou
+        event.processed. A regra escolhe                                    de latência e distribuição de drift por fonte.   evidência temporal precisa ser probatória.   vector clocks para preservar
+        explicitamente a âncora temporal.                                                                                                                                 causalidade local.
+
+
+
+
+                             Mitigação não é só “sincronizar NTP”: é projetar regras para conviver com
+                                                             incerteza.
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                                                                        35
+Pontos para pesquisa e discussão ﬁnal                                                                                                               FECHAMENTO
+
+
+
+
+      • Como reescrever regras SIEM para usar intervalos [t_earliest, t_latest]
+      sem travar alertas em tempo real?
+                                                                                  ↗       Referências-base
+      • Como medir e publicar “incerteza temporal” como métrica de qualidade
+      de dados?                                                                   Kleppmann, Designing Data-Intensive Applications; Corbett
+                                                                                  et al., Spanner; Lamport, Time, Clocks, and Ordering; RFC
+                                                                                  5905 (NTP); IEEE 1588 (PTP).
+      • Como combinar vector clocks com event time em pipelines
+      OpenTelemetry?
+
+      • Como detectar manipulação anti-forense de relógio em endpoints
+      comprometidos?
+
+      • Como benchmarkar impacto de drift, backpressure e late data em falsos
+      negativos?
+
+
+                                                                                      PRÓXIMA AULA: Lamport timestamps e Vector Clocks na prática
+
+
+
+
+Sistemas de Uso Intensivo de Dados • Aula 03 • Tempo, Consistência e SIEM                                                                                        36
+
