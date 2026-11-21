@@ -1,0 +1,3 @@
+[    2832ms] Cannot use 'import.meta' outside a module
+[   18543ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://demelo.atlassian.net/rest/api/2/issue/CON-298/properties/recurrence-config:1
+[   18569ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://demelo.atlassian.net/rest/api/latest/user/properties/autoHighlightingEnabled?accountId=620a6edd59709300698d3b6e:1

@@ -1,0 +1,469 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - status
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button "Mostrar barra lateral" [ref=e6] [cursor=pointer]
+        - button "Alternar aplicativos e sites" [ref=e9] [cursor=pointer]
+        - link "Acesse a página inicial do Jira" [ref=e14] [cursor=pointer]:
+          - /url: /jira
+          - generic [ref=e15]: Jira
+      - generic [ref=e24]:
+        - search [ref=e30]:
+          - textbox "Pesquisar" [ref=e33]
+        - button "Criar" [ref=e36] [cursor=pointer]
+      - navigation "Actions" [ref=e40]:
+        - list [ref=e41]:
+          - listitem [ref=e42]:
+            - button "Notificações" [ref=e44] [cursor=pointer]
+          - listitem [ref=e51]:
+            - button "Ajuda" [ref=e52] [cursor=pointer]
+          - listitem [ref=e57]:
+            - button "Configurações" [ref=e58] [cursor=pointer]
+          - listitem [ref=e62]:
+            - button "victorcupinxa@gmail.com" [ref=e63] [cursor=pointer]
+    - main [ref=e69]:
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - generic [ref=e82]:
+            - navigation "Trilhas do ticket" [ref=e86]:
+              - list [ref=e87]:
+                - listitem [ref=e88]:
+                  - img "confreg" [ref=e91]
+                  - listitem [ref=e92]:
+                    - link "confreg" [ref=e93] [cursor=pointer]:
+                      - /url: https://demelo.atlassian.net/browse/CON
+                  - text: /
+                - listitem [ref=e95]:
+                  - button "Epic" [ref=e97] [cursor=pointer]:
+                    - img "Epic" [ref=e99]
+                  - listitem [ref=e100]:
+                    - link "CON-274" [ref=e101] [cursor=pointer]:
+                      - /url: https://demelo.atlassian.net/browse/CON-274
+                  - text: /
+                - listitem [ref=e103]:
+                  - button "Tarefa" [ref=e105] [cursor=pointer]:
+                    - img "Tarefa" [ref=e107]
+                  - listitem [ref=e108]:
+                    - link "CON-298" [ref=e109] [cursor=pointer]:
+                      - /url: /browse/CON-298
+                  - generic [ref=e112]:
+                    - textbox [aria-hidden] [ref=e113]
+                    - button [ref=e114] [cursor=pointer]:
+                      - img "Copiar link" [ref=e116]
+            - generic [ref=e119]:
+              - generic [ref=e128]:
+                - button "Alinha com Raquel e RSL- Resumo, edit"
+                - heading "Alinha com Raquel e RSL" [level=1] [ref=e130]
+              - generic [ref=e135]:
+                - button "Adicionar apps" [ref=e136] [cursor=pointer]
+                - button "Adicione ao ticket" [ref=e142] [cursor=pointer]
+                - button "Abrir na ferramenta de codificação" [ref=e147] [cursor=pointer]
+          - generic [ref=e152]:
+            - generic [ref=e154]:
+              - generic [ref=e156]:
+                - heading "Informações principais Recolher Informações principais" [level=2] [ref=e157]:
+                  - generic [ref=e159]:
+                    - generic [ref=e160] [cursor=pointer]: Informações principais
+                    - button "Recolher Informações principais" [expanded] [ref=e164] [cursor=pointer]
+                - region "Seção Informações principais" [ref=e168]:
+                  - generic [ref=e170]:
+                    - button "Categorias Editar Categorias URGENT" [ref=e173] [cursor=pointer]:
+                      - generic [ref=e175]:
+                        - generic [ref=e176]: Categorias
+                        - generic [ref=e179]:
+                          - button "Editar Categorias" [ref=e180]
+                          - list [ref=e181]:
+                            - listitem [ref=e182]:
+                              - link "URGENT" [ref=e186]:
+                                - /url: /issues/?jql=labels%20%3D%20%22URGENT%22
+                    - button "Prioridade Editar Prioridade Highest" [ref=e190] [cursor=pointer]:
+                      - generic [ref=e192]:
+                        - generic [ref=e193]: Prioridade
+                        - generic [ref=e196]:
+                          - button "Editar Prioridade" [ref=e197]
+                          - generic [ref=e198]: Highest
+                    - button "Adicionar uma descrição" [ref=e202]
+                    - button "Data de entrega Editar Data de entrega, 24/11/2026 A ser entregue em 24 de nov. de 2026" [ref=e210] [cursor=pointer]:
+                      - generic [ref=e212]:
+                        - generic [ref=e213]: Data de entrega
+                        - generic [ref=e216]:
+                          - button "Editar Data de entrega, 24/11/2026" [ref=e217]
+                          - generic [ref=e220]:
+                            - generic [ref=e221]: A ser entregue em 24 de nov. de 2026
+                            - generic [aria-hidden] [ref=e224]: 24 de nov. de 2026
+                    - button "Data de início Editar Data de início, 20/11/2026 20 de nov. de 2026" [ref=e227] [cursor=pointer]:
+                      - generic [ref=e229]:
+                        - generic [ref=e230]: Data de início
+                        - generic [ref=e233]:
+                          - button "Editar Data de início, 20/11/2026" [ref=e234]
+                          - generic [ref=e235]: 20 de nov. de 2026
+                    - button "Pai Editar Pai Ícone Epic CON-274 ES - Michel" [ref=e238] [cursor=pointer]:
+                      - generic [ref=e240]:
+                        - generic [ref=e241]: Pai
+                        - generic [ref=e244]:
+                          - button "Editar Pai" [ref=e245]
+                          - generic [ref=e247]:
+                            - img "Ícone Epic" [ref=e248]
+                            - link "CON-274 ES - Michel" [ref=e251]:
+                              - /url: /browse/CON-274
+                    - button "Estimativa original Editar Controle de tempo 1s" [ref=e256] [cursor=pointer]:
+                      - generic [ref=e258]:
+                        - generic [ref=e259]: Estimativa original
+                        - generic [ref=e262]:
+                          - button "Editar Controle de tempo" [ref=e263]
+                          - generic [ref=e264]: 1s
+                    - button "Story point estimate Editar Story point estimate 13" [ref=e268] [cursor=pointer]:
+                      - generic [ref=e270]:
+                        - generic [ref=e271]: Story point estimate
+                        - generic [ref=e275]:
+                          - button "Editar Story point estimate" [ref=e276]
+                          - generic [ref=e277]: "13"
+                    - button "Responsável TI-support- editar Responsável TI-support" [ref=e280] [cursor=pointer]:
+                      - generic [ref=e282]:
+                        - generic [ref=e283]: Responsável
+                        - generic [ref=e287]:
+                          - button "TI-support- editar Responsável" [ref=e288]
+                          - generic [ref=e289]: TI-support
+                    - button "Sprint Editar Sprint quadro Sprint 13" [ref=e300] [cursor=pointer]:
+                      - generic [ref=e302]:
+                        - generic [ref=e303]: Sprint
+                        - generic [ref=e306]:
+                          - button "Editar Sprint" [ref=e307]
+                          - link "quadro Sprint 13" [ref=e310]:
+                            - /url: /secure/GHGoToBoard.jspa?sprintId=270
+              - generic [ref=e312]:
+                - button "Adicionar anexo" [ref=e314] [cursor=pointer]
+                - button "Adicionar ticket vinculado" [ref=e317] [cursor=pointer]
+            - generic [ref=e320]:
+              - heading "Tickets filho Recolher Tickets filho Adicionar subtarefa Ações do ticket" [level=2] [ref=e321]:
+                - generic [ref=e322]:
+                  - generic [ref=e323]:
+                    - generic [ref=e324] [cursor=pointer]: Tickets filho
+                    - button "Recolher Tickets filho" [expanded] [ref=e328] [cursor=pointer]
+                  - generic [ref=e330]:
+                    - button "Adicionar subtarefa" [ref=e331] [cursor=pointer]
+                    - button "Ações do ticket" [ref=e336] [cursor=pointer]
+              - region "Seção Tickets filho" [ref=e342]:
+                - generic [ref=e343]:
+                  - generic [ref=e344]:
+                    - generic [ref=e346]:
+                      - generic [ref=e347]: "0"
+                      - text: "% concluído"
+                    - progressbar "Progresso do ticket filho" [ref=e349]
+                  - table "Ticket (cabeçalhos de coluna com botões são classificáveis)" [ref=e356]:
+                    - rowgroup [ref=e357]:
+                      - row [ref=e358]:
+                        - columnheader "Ticket Mais ações para Ticket" [ref=e359]:
+                          - generic [ref=e360]:
+                            - generic [ref=e361]: Ticket
+                            - generic:
+                              - generic:
+                                - button "Mais ações para Ticket"
+                        - columnheader "Status • Classificar em ordem crescente Mais ações para Status" [ref=e363]:
+                          - generic [ref=e364]:
+                            - generic [aria-hidden] [ref=e366]: Status
+                            - generic:
+                              - generic:
+                                - button "Status • Classificar em ordem crescente"
+                              - generic:
+                                - button "Mais ações para Status"
+                        - columnheader "Criado • Ordenar do mais antigo ao mais recente Mais ações para Criado" [ref=e367]:
+                          - generic [ref=e368]:
+                            - generic [aria-hidden] [ref=e370]: Criado
+                            - generic:
+                              - generic:
+                                - button "Criado • Ordenar do mais antigo ao mais recente"
+                              - generic:
+                                - button "Mais ações para Criado"
+                        - columnheader "Categorias • Ordenar de A a Z Mais ações para Categorias" [ref=e371]:
+                          - generic [ref=e372]:
+                            - generic [aria-hidden] [ref=e374]: Categorias
+                            - generic:
+                              - generic:
+                                - button "Categorias • Ordenar de A a Z"
+                              - generic:
+                                - button "Mais ações para Categorias"
+                        - columnheader "Data de entrega • Ordenar do mais antigo ao mais recente Mais ações para Data de entrega" [ref=e375]:
+                          - generic [ref=e376]:
+                            - generic [aria-hidden] [ref=e378]: Data de entrega
+                            - generic:
+                              - generic:
+                                - button "Data de entrega • Ordenar do mais antigo ao mais recente"
+                              - generic:
+                                - button "Mais ações para Data de entrega"
+                        - columnheader "Data de início • Ordenar do mais antigo ao mais recente Mais ações para Data de início" [ref=e379]:
+                          - generic [ref=e380]:
+                            - generic [aria-hidden] [ref=e382]: Data de início
+                            - generic:
+                              - generic:
+                                - button "Data de início • Ordenar do mais antigo ao mais recente"
+                              - generic:
+                                - button "Mais ações para Data de início"
+                        - columnheader "Prioridade • Ordenar do mais baixo ao mais alto Mais ações para Prioridade" [ref=e383]:
+                          - generic [ref=e384]:
+                            - generic [aria-hidden] [ref=e386]: Prioridade
+                            - generic:
+                              - generic:
+                                - button "Prioridade • Ordenar do mais baixo ao mais alto"
+                              - generic:
+                                - button "Mais ações para Prioridade"
+                        - columnheader "Story point estimate • Classificar em ordem crescente Mais ações para Story point estimate" [ref=e387]:
+                          - generic [ref=e388]:
+                            - generic [aria-hidden] [ref=e390]: Story point estimate
+                            - generic:
+                              - generic:
+                                - button "Story point estimate • Classificar em ordem crescente"
+                              - generic:
+                                - button "Mais ações para Story point estimate"
+                        - columnheader "Pai • Ordenar de A a Z Mais ações para Pai" [ref=e391]:
+                          - generic [ref=e392]:
+                            - generic [aria-hidden] [ref=e394]: Pai
+                            - generic:
+                              - generic:
+                                - button "Pai • Ordenar de A a Z"
+                              - generic:
+                                - button "Mais ações para Pai"
+                        - columnheader "Σ de Progresso Mais ações para Σ de Progresso" [ref=e395]:
+                          - generic [ref=e396]:
+                            - generic [ref=e397]: Σ de Progresso
+                            - generic:
+                              - generic:
+                                - button "Mais ações para Σ de Progresso"
+                        - columnheader "Σ Estimativa de trabalho restante Mais ações para Σ Estimativa de trabalho restante" [ref=e399]:
+                          - generic [ref=e400]:
+                            - generic [ref=e401]: Σ Estimativa de trabalho restante
+                            - generic:
+                              - generic:
+                                - button "Mais ações para Σ Estimativa de trabalho restante"
+                        - columnheader "Σ da Estimativa Original Mais ações para Σ da Estimativa Original" [ref=e403]:
+                          - generic [ref=e404]:
+                            - generic [ref=e405]: Σ da Estimativa Original
+                            - generic:
+                              - generic:
+                                - button "Mais ações para Σ da Estimativa Original"
+                        - columnheader "Σ de Tempo Gasto Mais ações para Σ de Tempo Gasto" [ref=e407]:
+                          - generic [ref=e408]:
+                            - generic [ref=e409]: Σ de Tempo Gasto
+                            - generic:
+                              - generic:
+                                - button "Mais ações para Σ de Tempo Gasto"
+                        - columnheader "Tempo gasto • Classificar em ordem crescente Mais ações para Tempo gasto" [ref=e411]:
+                          - generic [ref=e412]:
+                            - generic [aria-hidden] [ref=e414]: Tempo gasto
+                            - generic:
+                              - generic:
+                                - button "Tempo gasto • Classificar em ordem crescente"
+                              - generic:
+                                - button "Mais ações para Tempo gasto"
+                        - columnheader "Progresso • Classificar em ordem crescente Mais ações para Progresso" [ref=e415]:
+                          - generic [ref=e416]:
+                            - generic [aria-hidden] [ref=e418]: Progresso
+                            - generic:
+                              - generic:
+                                - button "Progresso • Classificar em ordem crescente"
+                              - generic:
+                                - button "Mais ações para Progresso"
+                        - columnheader "Resolvido • Ordenar do mais antigo ao mais recente Mais ações para Resolvido" [ref=e419]:
+                          - generic [ref=e420]:
+                            - generic [aria-hidden] [ref=e422]: Resolvido
+                            - generic:
+                              - generic:
+                                - button "Resolvido • Ordenar do mais antigo ao mais recente"
+                              - generic:
+                                - button "Mais ações para Resolvido"
+                        - columnheader "Categoria do status alterada • Classificar em ordem crescente Mais ações para Categoria do status alterada" [ref=e423]:
+                          - generic [ref=e424]:
+                            - generic [aria-hidden] [ref=e426]: Categoria do status alterada
+                            - generic:
+                              - generic:
+                                - button "Categoria do status alterada • Classificar em ordem crescente"
+                              - generic:
+                                - button "Mais ações para Categoria do status alterada"
+                        - columnheader "Configurar colunas" [ref=e427]:
+                          - button "Configurar colunas" [ref=e430] [cursor=pointer]
+                    - rowgroup [ref=e434]:
+                      - row [ref=e435]:
+                        - rowheader "CON-299 não foi resolvido Copiar link Ler o parasif e overleaf" [ref=e436]:
+                          - generic [ref=e437]:
+                            - generic [ref=e438]:
+                              - link "CON-299 não foi resolvido" [ref=e440] [cursor=pointer]:
+                                - /url: /jira/browse/CON-299
+                                - text: CON-299
+                              - button "Copiar link" [ref=e442] [cursor=pointer]
+                            - generic [ref=e446]:
+                              - button [disabled] [aria-hidden] [ref=e447]
+                              - generic [ref=e448]: Ler o parasif e overleaf
+                        - cell [ref=e449]:
+                          - button "TO DO - not important - Alterar status" [ref=e453] [cursor=pointer]:
+                            - generic [ref=e454]: TO DO - not important
+                        - cell "20 de nov. de 2026, 18:59" [ref=e457]:
+                          - button [disabled] [aria-hidden] [ref=e458]
+                        - cell [ref=e460]:
+                          - button [disabled] [aria-hidden] [ref=e461]
+                          - generic [ref=e463]:
+                            - link "NOT-URGENT" [ref=e468] [cursor=pointer]:
+                              - /url: /issues?jql=labels%20%3D%20%22NOT-URGENT%22
+                            - button "+1" [ref=e470] [cursor=pointer]
+                        - cell "24 de nov. de 2026" [ref=e473]:
+                          - button [disabled] [aria-hidden] [ref=e474]
+                        - cell "20 de nov. de 2026" [ref=e476]:
+                          - button [disabled] [aria-hidden] [ref=e477]
+                        - cell "Medium" [ref=e479]:
+                          - button [disabled] [aria-hidden] [ref=e480]
+                        - cell "1" [ref=e483]:
+                          - button [disabled] [aria-hidden] [ref=e484]
+                        - cell [ref=e490]:
+                          - button [disabled] [aria-hidden] [ref=e491]
+                          - generic [ref=e492]:
+                            - img "Ícone Tarefa" [ref=e493]
+                            - link "CON-298 Alinha com Raquel e RSL" [ref=e496] [cursor=pointer]:
+                              - /url: /browse/CON-298
+                        - cell [ref=e498]:
+                          - table [ref=e500]:
+                            - rowgroup [ref=e501]:
+                              - row [ref=e502]:
+                                - cell "0%" [ref=e503]:
+                                  - paragraph: 0%
+                                - cell [ref=e504]:
+                                  - table [ref=e505]:
+                                    - rowgroup [ref=e506]:
+                                      - row [ref=e507]:
+                                        - cell [ref=e508]:
+                                          - table [ref=e509]:
+                                            - rowgroup [ref=e510]:
+                                              - row [ref=e511]:
+                                                - cell [ref=e512]:
+                                                  - img "Estimativa original - 1 dia" [ref=e513]
+                                                - cell [ref=e514]:
+                                                  - img "Estimativa original - 1 dia" [ref=e515]
+                                      - row [ref=e516]:
+                                        - cell [ref=e517]:
+                                          - table [ref=e518]:
+                                            - rowgroup [ref=e519]:
+                                              - row [ref=e520]:
+                                                - cell [ref=e521]:
+                                                  - img "Estimativa de trabalho restante - 2 dias" [ref=e522]
+                        - cell "2 days" [ref=e523]
+                        - cell "1 day" [ref=e525]
+                        - cell [ref=e527]
+                        - cell [ref=e528]
+                        - cell [ref=e529]:
+                          - table [ref=e531]:
+                            - rowgroup [ref=e532]:
+                              - row [ref=e533]:
+                                - cell "0%" [ref=e534]:
+                                  - paragraph: 0%
+                                - cell [ref=e535]:
+                                  - table [ref=e536]:
+                                    - rowgroup [ref=e537]:
+                                      - row [ref=e538]:
+                                        - cell [ref=e539]:
+                                          - table [ref=e540]:
+                                            - rowgroup [ref=e541]:
+                                              - row [ref=e542]:
+                                                - cell [ref=e543]:
+                                                  - img "Estimativa original - 1 dia" [ref=e544]
+                                                - cell [ref=e545]:
+                                                  - img "Estimativa original - 1 dia" [ref=e546]
+                                      - row [ref=e547]:
+                                        - cell [ref=e548]:
+                                          - table [ref=e549]:
+                                            - rowgroup [ref=e550]:
+                                              - row [ref=e551]:
+                                                - cell [ref=e552]:
+                                                  - img "Estimativa de trabalho restante - 2 dias" [ref=e553]
+                        - cell "Adicionar data" [ref=e554]:
+                          - button [disabled] [aria-hidden] [ref=e555]
+                        - cell "20 de nov. de 2026, 18:59" [ref=e557]:
+                          - button [disabled] [aria-hidden] [ref=e558]
+                        - cell [ref=e560]
+            - generic [ref=e565]:
+              - generic [ref=e567]:
+                - generic [ref=e568]:
+                  - heading "Atividade Comentários" [level=2] [ref=e569] [cursor=pointer]:
+                    - generic [ref=e570]:
+                      - generic [ref=e571]: Atividade
+                      - generic [ref=e572]: Comentários
+                  - button "Recolher Atividade" [expanded] [ref=e575] [cursor=pointer]
+                - generic [ref=e579]:
+                  - tablist "Mostrar" [ref=e582]:
+                    - tab "Tudo" [ref=e583] [cursor=pointer]
+                    - tab "Comentários" [selected] [ref=e586] [cursor=pointer]
+                    - tab "Registro de atividades" [ref=e590] [cursor=pointer]
+                  - button "Mais ações" [ref=e594] [cursor=pointer]
+              - region "Seção Atividade" [ref=e600]:
+                - tabpanel "Comentários" [ref=e601]:
+                  - button [ref=e610]:
+                    - generic [ref=e611]:
+                      - text: Faça um comentário ou pressione
+                      - generic [ref=e613]: M
+        - generic [ref=e614]:
+          - generic [ref=e616]:
+            - slider "Redimensionar o painel lateral da visualização do ticket" [ref=e617]: "0.3"
+            - text: Redimensionar o painel lateral da visualização do ticket
+          - generic [ref=e620] [cursor=pointer]
+        - generic [ref=e623]:
+          - generic [ref=e627]:
+            - button "TO DO - not important - Alterar status" [ref=e635] [cursor=pointer]:
+              - generic [ref=e636]: TO DO - not important
+            - generic [ref=e641]:
+              - 'button "Opções para seguir: Você está seguindo este item, 1 pessoa seguindo" [ref=e643] [cursor=pointer]':
+                - generic [ref=e646]: "1"
+              - button "Mais ações" [ref=e651] [cursor=pointer]
+          - generic [ref=e657]:
+            - generic [ref=e659]:
+              - heading [level=2] [ref=e660]:
+                - button "Recolher Informações" [expanded] [ref=e662] [cursor=pointer]:
+                  - generic [ref=e663]: Informações
+              - region "Seção Informações" [ref=e670]:
+                - button "Controle de tempo 10m registrado, 1w 1d 7h 50m restante- editar , edit 10m registrado 1s 1d 7h 50m restante(s) Incluir tickets filho Arraste para reordenar" [ref=e680] [cursor=pointer]:
+                  - generic [ref=e681]:
+                    - generic [ref=e682]:
+                      - generic [ref=e683]: Controle de tempo
+                      - generic [ref=e687]:
+                        - generic [ref=e691]:
+                          - button "10m registrado, 1w 1d 7h 50m restante- editar , edit"
+                          - generic [ref=e697]:
+                            - generic [ref=e698]: 10m registrado
+                            - generic [ref=e699]: 1s 1d 7h 50m restante(s)
+                        - generic [ref=e701]:
+                          - checkbox "Incluir tickets filho" [checked] [ref=e702]
+                          - generic [ref=e703]: Incluir tickets filho
+                    - generic:
+                      - generic:
+                        - button "Arraste para reordenar"
+            - generic:
+              - button "Ações da aba Dados"
+              - button "Drag to reorder"
+          - generic [ref=e706]:
+            - generic [ref=e711]:
+              - generic [ref=e714] [cursor=pointer]:
+                - button [expanded] [ref=e715]:
+                  - heading "Desenvolvimento" [level=2] [ref=e718]
+                - generic [ref=e722]:
+                  - generic:
+                    - button "Ferramentas de desenvolvimento"
+              - generic [ref=e728]:
+                - button "Começar a codificar" [ref=e731] [cursor=pointer]
+                - button "Ver atividade de desenvolvimento" [ref=e738] [cursor=pointer]
+            - generic:
+              - button "Drag to reorder"
+          - generic [ref=e742]:
+            - heading [level=2] [ref=e746]:
+              - button "Expandir Automação" [ref=e748] [cursor=pointer]:
+                - generic [ref=e749]: Automação
+            - generic:
+              - button "Drag to reorder"
+          - generic [ref=e753]:
+            - generic [ref=e755]:
+              - text: Criado
+              - button [ref=e756] [cursor=pointer]:
+                - time [ref=e757]: há 30 minutos
+            - generic [ref=e759]:
+              - text: Atualizado
+              - button [ref=e760] [cursor=pointer]:
+                - time [ref=e761]: há 27 minutos
