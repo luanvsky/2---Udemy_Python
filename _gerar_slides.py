@@ -1,279 +1,419 @@
-import pymupdf, html, base64, os
+"""
+Primeira aula de Python: criar slides em PDF.
+
+Este programa tem quatro partes:
+1. guardar configuracoes;
+2. guardar o texto dos slides;
+3. desenhar cada slide;
+4. juntar todos os slides em um PDF.
+"""
+
+
+# Bibliotecas: sao codigo pronto que podemos usar.
+import os
+import html
+import base64
+
+import pymupdf
 from PIL import Image
 
-W, H = 960, 540
-NAVY, BLUE, RED, GREY, DARK = "#12294a", "#1f6feb", "#c0392b", "#7a8699", "#1b1f27"
-FONT = "Segoe UI,Arial,Helvetica"
-LOGOS = r"D:\dsh-vsky\_logos"
+
+# ==========================
+# 1. INFORMACOES BASICAS
+# ==========================
+
+# Uma variavel guarda uma informacao.
+LARGURA = 960
+ALTURA = 540
+
+# A pasta atual e a pasta onde este arquivo esta salvo.
+PASTA_DO_PROGRAMA = os.path.dirname(os.path.abspath(__file__))
+
+# Nestas variaveis, juntamos nomes de pastas e arquivos.
+PASTA_DAS_IMAGENS = os.path.join(PASTA_DO_PROGRAMA, "_logos")
+ARQUIVO_FINAL = os.path.join(PASTA_DO_PROGRAMA, "Slides_XBRL_5min.pdf")
+
+# Cores escritas em formato HTML.
+AZUL_ESCuro = "#12294a"
+AZUL = "#1f6feb"
+VERMELHO = "#c0392b"
+CINZA = "#7a8699"
+PRETO = "#1b1f27"
+BRANCO = "#ffffff"
+
+FONTE = "Segoe UI,Arial,Helvetica"
 
 
-def _b64(name):
-    with open(os.path.join(LOGOS, name), "rb") as f:
-        return "data:image/png;base64," + base64.b64encode(f.read()).decode("ascii")
+# ==========================
+# 2. FUNCOES AUXILIARES
+# ==========================
+
+def pegar_imagem_em_texto(nome_da_imagem):
+    """
+    Esta funcao le uma imagem e transforma a imagem em texto.
+    Isso permite colocar a imagem dentro do slide.
+    """
+    caminho = os.path.join(PASTA_DAS_IMAGENS, nome_da_imagem)
+
+    arquivo = open(caminho, "rb")
+    dados = arquivo.read()
+    arquivo.close()
+
+    texto = base64.b64encode(dados).decode("ascii")
+    return "data:image/png;base64," + texto
 
 
-def _ratio(name):
-    im = Image.open(os.path.join(LOGOS, name))
-    return im.size[0] / im.size[1]
+def pegar_tamanho_da_imagem(nome_da_imagem):
+    """
+    Esta funcao descobre a proporcao da imagem.
+    Proporcao significa largura dividida pela altura.
+    """
+    caminho = os.path.join(PASTA_DAS_IMAGENS, nome_da_imagem)
+    imagem = Image.open(caminho)
+    largura = imagem.width
+    altura = imagem.height
+    imagem.close()
+    return largura / altura
 
 
-UFS_MARK = _b64("UFS_crest.png")          # brasão UFS (ratio ~0.56)
-PROCC_MARK = _b64("procc_logo.png")       # PROCC (ratio ~2.30)
-
-R_UFS = _ratio("UFS_crest.png")
-R_PROCC = _ratio("procc_logo.png")
-
-
-def esc(s):
-    return html.escape(s)
+def proteger_texto(texto):
+    """
+    Esta funcao troca alguns caracteres especiais.
+    Por exemplo: o caractere < vira &lt;.
+    """
+    return html.escape(texto)
 
 
-def img_tag(uri, x, y, width, ratio):
-    """Image at top-left (x, y) with given width, height from aspect ratio."""
-    return (
-        f'<image x="{x:.1f}" y="{y:.1f}" width="{width:.1f}" height="{width / ratio:.1f}" '
-        f'xlink:href="{uri}" href="{uri}" preserveAspectRatio="xMidYMid meet"/>'
+def criar_imagem_svg(imagem, x, y, largura, proporcao):
+    """
+    Esta funcao cria o texto SVG necessario para mostrar uma imagem.
+    SVG e o formato usado para desenhar o slide.
+    """
+    altura = largura / proporcao
+
+    codigo = (
+        '<image '
+        'x="' + str(x) + '" '
+        'y="' + str(y) + '" '
+        'width="' + str(largura) + '" '
+        'height="' + str(altura) + '" '
+        'xlink:href="' + imagem + '" '
+        'href="' + imagem + '" '
+        'preserveAspectRatio="xMidYMid meet"/>'
     )
+    return codigo
 
 
-def slide(title, lines, footer, tag=None):
-    is_title = tag is None
-    out = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
-        f'width="{W}" height="{H}" viewBox="0 0 {W} {H}">',
-        f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-        f'<rect x="0" y="0" width="{W}" height="8" fill="{BLUE}"/>',
+# ==========================
+# 3. PREPARAR AS IMAGENS
+# ==========================
+
+# Uma imagem precisa ser convertida uma unica vez.
+BRASAO_UFS = pegar_imagem_em_texto("UFS_crest.png")
+LOGO_PROCC = pegar_imagem_em_texto("procc_logo.png")
+
+PROPORCAO_UFS = pegar_tamanho_da_imagem("UFS_crest.png")
+PROPORCAO_PROCC = pegar_tamanho_da_imagem("procc_logo.png")
+
+
+# ==========================
+# 4. DESENHAR UM SLIDE
+# ==========================
+
+def desenho_do_slide(titulo, linhas, numero):
+    """
+    Esta funcao recebe um titulo e uma lista de linhas.
+    Depois, ela cria o desenho completo de um slide.
+    """
+
+    # Comecamos o desenho em SVG.
+    codigo = [
+        '<svg xmlns="http://www.w3.org/2000/svg" '
+        'xmlns:xlink="http://www.w3.org/1999/xlink" '
+        'width="960" height="540" viewBox="0 0 960 540">',
+        '<rect width="960" height="540" fill="#ffffff"/>',
+        '<rect width="960" height="8" fill="' + AZUL + '"/>',
     ]
 
-    if is_title:
-        # title slide: UFS crest top-right, PROCC mark centred at the bottom
-        out.append(img_tag(UFS_MARK, W - 60 - 88, 40, 88, R_UFS))
-        out.append(img_tag(PROCC_MARK, (W - 200) / 2, 418, 200, R_PROCC))
+    # Se numero estiver vazio, este e o primeiro slide.
+    if numero == "":
+        y = 120
+    else:
+        y = 74
 
-    y = 120 if is_title else 74
-    if tag:
-        out.append(
-            f'<text x="60" y="{y}" font-family="{FONT}" font-size="17" font-weight="700" '
-            f'fill="{BLUE}" letter-spacing="1.2">{esc(tag)}</text>'
+    # Numero do slide.
+    if numero != "":
+        codigo.append(
+            '<text x="60" y="' + str(y) + '" '
+            'font-family="' + FONTE + '" '
+            'font-size="17" font-weight="700" '
+            'fill="' + AZUL + '">' + numero + '</text>'
         )
-        y += 40
-        # institutional mark top-right on every content slide
-        out.append(img_tag(UFS_MARK, W - 60 - 58, 38, 58, R_UFS))
-    out.append(
-        f'<text x="60" y="{y}" font-family="{FONT}" font-size="38" font-weight="700" '
-        f'fill="{NAVY}">{esc(title)}</text>'
-    )
-    y += 30
-    # title slide stops its rule before the crest so nothing overlaps
-    rule_x1 = 792 if is_title else (W - 60)
-    out.append(f'<line x1="60" y1="{y}" x2="{rule_x1}" y2="{y}" stroke="{BLUE}" stroke-width="2.5"/>')
-    y += 56
+        y = y + 40
 
-    if is_title:
-        # title slide: text block centred under the rule
-        y = 268
-        for text, style in lines:
-            if not text.strip():
-                y += 12
-                continue
-            is_author = style == "k"
-            size = 30 if is_author else (23 if style == "g" else 25)
-            weight = "700" if is_author else "400"
-            color = NAVY if is_author else (GREY if style == "g" else DARK)
-            out.append(
-                f'<text x="{W/2}" y="{y}" text-anchor="middle" font-family="{FONT}" '
-                f'font-size="{size}" font-weight="{weight}" fill="{color}">{esc(text)}</text>'
+        codigo.append(
+            criar_imagem_svg(
+                BRASAO_UFS,
+                842,
+                38,
+                58,
+                PROPORCAO_UFS,
             )
-            y += size + 20
-        out.append("</svg>")
-        return "".join(out)
-
-    for text, style in lines:
-        # blank line = small spacer, not a full line height
-        if not text.strip():
-            y += 16
-            continue
-        color, size, weight = DARK, 27, "400"
-        if style == "k":
-            color, size, weight = NAVY, 33, "700"
-        elif style == "b":
-            color, size, weight = BLUE, 29, "700"
-        elif style == "r":
-            color, size, weight = RED, 27, "700"
-        elif style == "g":
-            color, size, weight = GREY, 22, "400"
-        elif style == "s":
-            color, size, weight = DARK, 23, "400"
-        elif style == "m":
-            color, size, weight = NAVY, 28, "700"
-        elif style == "n":
-            color, size, weight = RED, 25, "700"
-        elif style == "t":
-            color, size, weight = NAVY, 27, "700"
-        elif style == "q":
-            color, size, weight = NAVY, 22, "700"
-        out.append(
-            f'<text x="60" y="{y}" font-family="{FONT}" font-size="{size}" '
-            f'font-weight="{weight}" fill="{color}">{esc(text)}</text>'
         )
-        y += size + 19
 
-    out.append(
-        f'<text x="60" y="{H - 30}" font-family="{FONT}" font-size="16" '
-        f'fill="{GREY}">{esc(footer)}</text>'
+    # Brasao e logo especiais da primeira pagina.
+    if numero == "":
+        codigo.append(
+            criar_imagem_svg(
+                BRASAO_UFS,
+                812,
+                40,
+                88,
+                PROPORCAO_UFS,
+            )
+        )
+        codigo.append(
+            criar_imagem_svg(
+                LOGO_PROCC,
+                380,
+                418,
+                200,
+                PROPORCAO_PROCC,
+            )
+        )
+
+    # Titulo do slide.
+    codigo.append(
+        '<text x="60" y="' + str(y) + '" '
+        'font-family="' + FONTE + '" '
+        'font-size="38" font-weight="700" '
+        'fill="' + AZUL_ESCuro + '">' +
+        proteger_texto(titulo) +
+        '</text>'
     )
-    out.append("</svg>")
-    return "".join(out)
+
+    y = y + 86
+
+    # Linhas de texto do slide.
+    for linha in linhas:
+        texto = linha[0]
+        tipo = linha[1]
+
+        # Uma linha vazia deixa um espaco em branco.
+        if texto == "":
+            y = y + 16
+            continue
+
+        # Valores padrao: cor preta e texto comum.
+        cor = PRETO
+        tamanho = 27
+        peso = "400"
+
+        # Cada tipo troca o visual da linha.
+        if tipo == "k":
+            cor = AZUL_ESCuro
+            tamanho = 33
+            peso = "700"
+        elif tipo == "b":
+            cor = AZUL
+            tamanho = 29
+            peso = "700"
+        elif tipo == "r":
+            cor = VERMELHO
+            tamanho = 27
+            peso = "700"
+        elif tipo == "g":
+            cor = CINZA
+            tamanho = 22
+            peso = "400"
+        elif tipo == "m":
+            cor = AZUL_ESCuro
+            tamanho = 28
+            peso = "700"
+        elif tipo == "t":
+            cor = AZUL_ESCuro
+            tamanho = 27
+            peso = "700"
+        elif tipo == "q":
+            cor = AZUL_ESCuro
+            tamanho = 22
+            peso = "700"
+
+        codigo.append(
+            '<text x="60" y="' + str(y) + '" '
+            'font-family="' + FONTE + '" '
+            'font-size="' + str(tamanho) + '" '
+            'font-weight="' + peso + '" '
+            'fill="' + cor + '">' +
+            proteger_texto(texto) +
+            '</text>'
+        )
+        y = y + tamanho + 19
+
+    codigo.append("</svg>")
+
+    # Juntamos todas as partes da lista em uma unica string.
+    resultado = "".join(codigo)
+    return resultado
 
 
-PROGRESS = [f"{i} / 8" for i in range(1, 9)]
-_p = iter(PROGRESS)
+# ==========================
+# 5. TEXTO DOS SLIDES
+# ==========================
 
+# Cada slide e uma lista.
+# Cada linha e uma tupla: (texto, tipo).
 SLIDES = [
-    dict(
-        tag=None,
-        footer="",
-        title="Mineração de defeitos em relatórios XBRL",
-        lines=[
-            ("Uma análise empírica em diferentes jurisdições", "g"),
-            ("", "s"),
+    {
+        "numero": "",
+        "titulo": "Mineracao de defeitos em relatorios XBRL",
+        "linhas": [
+            ("Uma analise empirica em diferentes jurisdicoes", "g"),
+            ("", ""),
             ("Victor Cesar Santos de Melo", "k"),
-            ("Orientador: Prof. Fábio Gomes Rocha", ""),
-            ("Engenharia de Software Experimental — 2026.2", "g"),
+            ("Orientador: Prof. Fabio Gomes Rocha", ""),
+            ("Engenharia de Software Experimental - 2026.2", "g"),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="O problema",
-        lines=[
-            ("XBRL = padrão global de relatório financeiro", "k"),
-            ("legível por máquina", "k"),
-            ("", "s"),
+    },
+    {
+        "numero": "1 / 8",
+        "titulo": "O problema",
+        "linhas": [
+            ("XBRL = padrao global de relatorio financeiro", "k"),
+            ("legivel por maquina", "k"),
+            ("", ""),
             ("Governos, reguladores e empresas publicam assim", ""),
-            ("Mas: erros de validação são frequentes", "r"),
-            ("→ afetam qualidade, comparabilidade e transparência", ""),
-            ("", "s"),
-            ("Bases públicas: SEC · ESMA · Companies House", "g"),
+            ("Mas: erros de validacao sao frequentes", "r"),
+            ("=> afetam qualidade, comparabilidade e transparencia", ""),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="A pergunta",
-        lines=[
-            ("É possível medir defeito de validação XBRL de forma...", "m"),
-            ("", "s"),
-            ("estável?     ·     classificável?     ·     reprodutível?", "b"),
-            ("", "s"),
-            ("E o perfil de defeito varia entre jurisdições?", "k"),
-            ("", "s"),
-            ("Primeiro: DÁ PARA MEDIR?   Depois: o que a medição mostra?", "g"),
+    },
+    {
+        "numero": "2 / 8",
+        "titulo": "A pergunta",
+        "linhas": [
+            ("E possivel medir defeito de validacao XBRL?", "m"),
+            ("", ""),
+            ("estavel?", "b"),
+            ("classificavel?", "b"),
+            ("reproduzivel?", "b"),
+            ("", ""),
+            ("O perfil varia entre jurisdicoes?", "k"),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="Objeto e finalidade",
-        lines=[
-            ("OBJETO: o artefato de software — a instância XBRL", "k"),
-            ("FINALIDADE: caracterizar  (depois, comparar)", "b"),
+    },
+    {
+        "numero": "3 / 8",
+        "titulo": "Objeto e finalidade",
+        "linhas": [
+            ("OBJETO: a instancia XBRL", "k"),
+            ("FINALIDADE: caracterizar e comparar", "b"),
             ("PERSPECTIVA: Engenharia de Software Experimental", ""),
-            ("AMBIENTE: bases públicas, medição local", ""),
-            ("", "s"),
-            ("Não avalio a empresa. Não avalio o número contábil.", "r"),
-            ("Avalio conformidade com a especificação.", ""),
+            ("AMBIENTE: bases publicas", ""),
+            ("", ""),
+            ("Nao avaliamos empresas ou numeros contabeis.", "r"),
+            ("Avaliamos conformidade com a especificacao.", ""),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="O instrumento: Arelle",
-        lines=[
-            ("Processador XBRL certificado pela XBRL International", "m"),
-            ("Já traz os conjuntos de regras de cada jurisdição:", ""),
-            ("SEC  efm      ·      UE  esef      ·      Reino Unido  hmrc", "b"),
-            ("", "s"),
-            ("1.  A mesma ferramenta mede todas as jurisdições", ""),
-            ("2.  Não dependo do regulador publicar nada", ""),
-            ("3.  Qualquer pessoa reproduz o resultado", ""),
+    },
+    {
+        "numero": "4 / 8",
+        "titulo": "O instrumento: Arelle",
+        "linhas": [
+            ("Processador XBRL certificado", "m"),
+            ("", ""),
+            ("Possui regras para varias jurisdicoes:", ""),
+            ("SEC - ESEF - HMRC", "b"),
+            ("", ""),
+            ("A mesma ferramenta mede todos os casos.", ""),
+            ("Qualquer pessoa pode reproduzir o resultado.", ""),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="O que eu meço",
-        lines=[
-            ("Dimensão A — CLASSE  (o que a regra verifica)", "k"),
-            ("estrutural · tipo · cálculo · fórmula · dimensional · extensão", "s"),
-            ("", "s"),
-            ("Dimensão B — CAUSA-RAIZ  (por que falhou)", "k"),
-            ("mapeamento · dado ausente · extensão indevida", "s"),
-            ("Causa-raiz NÃO é observável na saída do validador", "r"),
-            ("", "s"),
-            ("Medida principal: defeitos POR FATO (não por arquivo)", "b"),
+    },
+    {
+        "numero": "5 / 8",
+        "titulo": "O que eu meco",
+        "linhas": [
+            ("Dimensao A - CLASSE", "k"),
+            ("o que a regra verifica", ""),
+            ("estrutural - tipo - calculo - formula", ""),
+            ("", ""),
+            ("Dimensao B - CAUSA-RAIZ", "k"),
+            ("por que o documento falhou", ""),
+            ("mapeamento - dado ausente - extensao indevida", ""),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="Como eu valido",
-        lines=[
-            ("1.  Determinismo — rodar 2x e comparar", "k"),
-            ("2.  Concordância — 2 codificadores, kappa de Cohen", "k"),
-            ("3.  Triangulação — mesma taxonomia, várias jurisdições", "t"),
-            ("4.  Reprodutibilidade — scripts e versões públicos", "k"),
-            ("", "s"),
-            ("Piloto: 6 fases, critério de decisão declarado ANTES", "b"),
+    },
+    {
+        "numero": "6 / 8",
+        "titulo": "Como eu valido",
+        "linhas": [
+            ("1. Determinismo - rodar duas vezes", "k"),
+            ("2. Concordancia - duas pessoas analisam", "k"),
+            ("3. Triangulacao - varias jurisdicoes", "t"),
+            ("4. Reprodutibilidade - scripts publicos", "k"),
+            ("", ""),
+            ("Piloto com seis fases.", "b"),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="O que me derruba",
-        lines=[
-            ("Eu só vejo o que passou pelo filtro.", "r"),
-            ("Instância publicada já foi aceita pelo regulador", ""),
-            ("→ meço conformidade RESIDUAL, não qualidade dos relatórios", ""),
-            ("", "s"),
-            ("Jurisdição ≠ qualidade — conjuntos de regras diferentes", "r"),
-            ("", "s"),
-            ("Estudo OBSERVACIONAL — não é experimento controlado", "b"),
+    },
+    {
+        "numero": "7 / 8",
+        "titulo": "O que me derruba",
+        "linhas": [
+            ("Vejo apenas o que passou pelo filtro.", "r"),
+            ("", ""),
+            ("Relatorios publicados ja foram aceitos.", ""),
+            ("Portanto, meço conformidade residual.", ""),
+            ("Nao meço toda a qualidade do documento.", ""),
+            ("", ""),
+            ("O estudo e observacional.", "b"),
         ],
-    ),
-    dict(
-        tag=next(_p),
-        footer="",
-        title="Escopo",
-        lines=[
+    },
+    {
+        "numero": "8 / 8",
+        "titulo": "Escopo",
+        "linhas": [
             ("NO ARTIGO", "b"),
-            ("1 pergunta · SEC · 1 trimestre · classe de defeito", ""),
-            ("", "s"),
+            ("Uma pergunta - SEC - um trimestre", ""),
+            ("", ""),
             ("TRABALHO FUTURO", "b"),
-            ("outras jurisdições · série histórica · causa-raiz · classificador", ""),
-            ("", "s"),
-            ("Uma pergunta bem respondida vale mais que quatro mal respondidas.", "q"),
+            ("outras jurisdicoes - historico - causa-raiz", ""),
+            ("", ""),
+            ("Uma pergunta bem respondida vale mais.", "q"),
         ],
-    ),
+    },
 ]
 
-doc = pymupdf.open()
-for s in SLIDES:
-    svg = slide(s["title"], s["lines"], s["footer"], s["tag"])
-    d = pymupdf.open("svg", svg.encode("utf-8"))
-    pdfbytes = d.convert_to_pdf()
-    d.close()
-    src = pymupdf.open("pdf", pdfbytes)
-    doc.insert_pdf(src)
-    src.close()
 
-doc.set_metadata(
+# ==========================
+# 6. CRIAR O PDF
+# ==========================
+
+# Criamos um documento vazio.
+documento = pymupdf.open()
+
+# Repetimos o processo para cada slide da lista.
+for slide in SLIDES:
+    numero = slide["numero"]
+    titulo = slide["titulo"]
+    linhas = slide["linhas"]
+
+    codigo_svg = desenho_do_slide(titulo, linhas, numero)
+
+    pagina_svg = pymupdf.open("svg", codigo_svg.encode("utf-8"))
+    codigo_pdf = pagina_svg.convert_to_pdf()
+    pagina_svg.close()
+
+    pagina_pdf = pymupdf.open("pdf", codigo_pdf)
+    documento.insert_pdf(pagina_pdf)
+    pagina_pdf.close()
+
+# Dados do PDF.
+documento.set_metadata(
     {
-        "title": "Mineração de defeitos em relatórios XBRL — Apresentação 5 min",
+        "title": "Mineracao de defeitos em relatorios XBRL",
         "author": "Victor Cesar Santos de Melo",
-        "subject": "Engenharia de Software Experimental — PROCC0094",
+        "subject": "Engenharia de Software Experimental",
     }
 )
-out = r"D:\dsh-vsky\Slides_XBRL_5min.pdf"
-doc.save(out, deflate=True)
-print("OK:", out, "| paginas:", doc.page_count)
+
+# O comando save cria o arquivo final.
+documento.save(ARQUIVO_FINAL, deflate=True)
+
+print("PDF criado:", ARQUIVO_FINAL)
+print("Quantidade de paginas:", documento.page_count)
